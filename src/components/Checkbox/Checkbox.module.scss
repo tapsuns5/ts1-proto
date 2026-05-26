@@ -1,0 +1,128 @@
+.checkbox {
+  @apply sui-text-body;
+
+  display: flex;
+  align-items: center;
+  gap: var(--sui-spacing-1);
+  position: relative;
+  padding-left: 2rem;
+  min-height: 1.5rem;
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    top: 0;
+    left: 0;
+    position: absolute;
+    z-index: 0;
+
+    path {
+      fill: var(--color-neutral-icon-medium);
+    }
+  }
+
+  label {
+    @apply sui-text-body sui-text-neutral-text;
+    cursor: pointer;
+  }
+
+  input[type="checkbox"] {
+    cursor: pointer;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+    width: 24px;
+    height: 24px;
+    margin: 0;
+
+    &:not(:disabled):hover + svg {
+      path {
+        fill: var(--color-admin-action-icon-hover);
+      }
+    }
+
+    &:checked {
+      + svg {
+        path {
+          fill: var(--color-admin-action-icon);
+        }
+      }
+
+      &:not(:disabled):hover + svg,
+      &:not(:disabled):focus + svg {
+        path {
+          fill: var(--color-admin-action-icon-hover);
+        }
+      }
+    }
+
+    &:disabled {
+      cursor: default;
+
+      ~ label {
+        cursor: default;
+      }
+
+      + svg {
+        fill: var(--sui-colors-neutral-icon-disabled);
+
+        path {
+          fill: var(--sui-colors-neutral-icon-disabled);
+        }
+      }
+    }
+  }
+
+  &.input__field--error {
+    input[type="checkbox"]:not(:checked) {
+      + svg {
+        path {
+          fill: var(--sui-colors-negative-icon);
+        }
+      }
+    }
+  }
+}
+
+.disabled {
+  label {
+    cursor: default;
+  }
+
+  input[type="checkbox"]:disabled {
+    cursor: default;
+  }
+
+  svg {
+    path {
+      fill: var(--sui-colors-neutral-icon-disabled);
+    }
+  }
+}
+
+.input__errors {
+  border-top: 1px solid var(--sui-colors-negative-border);
+  margin-top: var(--sui-spacing-1);
+}
+.input__error {
+  @apply sui-text-negative-text sui-caption;
+}
+
+.isPartial {
+  input[type="checkbox"] {
+    &:not(:disabled) + svg {
+      path {
+        fill: var(--sui-colors-action-icon);
+      }
+    }
+
+    &:not(:disabled):hover + svg {
+      path {
+        fill: var(--sui-colors-action-icon-hover);
+      }
+    }
+  }
+}

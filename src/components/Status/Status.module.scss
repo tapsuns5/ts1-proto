@@ -1,0 +1,51 @@
+.status {
+  @apply sui-label;
+  display: inline-flex;
+  height: 24px;
+  padding: 0px var(--spacing-1, 8px);
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-1, 8px);
+  flex-shrink: 0;
+  border-radius: 24px;
+}
+
+.status-dot {
+  @apply sui-label;
+  display: inline-flex;
+  align-items: center;
+}
+
+.status-dot-circle {
+  margin-right: 3px;
+}
+
+.status--success {
+  background: var(--Positive-Background, #d0f6cb);
+  color: var(--Positive-Text, #136f06);
+  fill: var(--Positive-Icon, #1a9608);
+}
+
+.status--warning {
+  background: var(--Warning-Background, #feed90);
+  color: var(--Warning-Text, #655601);
+  fill: var(--Warning-Icon-Medium, #fcd603);
+}
+
+.status--negative {
+  background: var(--Negative-Background, #fbddda);
+  color: var(--Negative-Text, #bf2313);
+  fill: var(--Negative-Icon-Hover, #bf2313);
+}
+
+.status--info {
+  background: var(--Info-Background, #c0ebfc);
+  color: var(--Info-Text, #076388);
+  fill: var(--Info-Icon, #076388);
+}
+
+.status--inactive {
+  background: var(--Neutral-Background-Medium, #f2f2f2);
+  color: var(--Neutral-Text-Medium, #666);
+  fill: var(--Neutral-Icon-Medium, #666);
+}

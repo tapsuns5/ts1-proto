@@ -1,0 +1,20 @@
+.table {
+  &.info {
+    background-color: var(--sui-colors-action-background);
+    color: white;
+  }
+  &.success {
+    background-color: var(--sui-colors-positive-background-strong);
+  }
+  &.warning {
+    background-color: var(--sui-colors-warning-background);
+  }
+  &.error {
+    background-color: var(--sui-colors-negative-background-strong);
+    color: white;
+  }
+  &.grayed {
+    background-color: var(--sui-colors-neutral-background-strong);
+    color: white;
+  }
+}

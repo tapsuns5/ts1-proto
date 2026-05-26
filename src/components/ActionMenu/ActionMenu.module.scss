@@ -1,0 +1,80 @@
+.ActionMenu {
+  border-radius: 0.3125rem;
+  border: 1px solid var(--sui-colors-neutral-border);
+  background: var(--sui-colors-neutral-background);
+  padding: var(--sui-spacing-0-5) 0;
+  min-width: 15rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  top: 0;
+  @apply sui-z-10;
+  /* Default Shadow */
+  box-shadow:
+    0.20664px 0.41429px 2.125px 0px rgba(0, 0, 0, 0.07),
+    0.90924px 1.82286px 4.4px 0px rgba(0, 0, 0, 0.05),
+    2.23176px 4.47429px 8.775px 0px rgba(0, 0, 0, 0.04),
+    4.29821px 8.61714px 17.2px 0px rgba(0, 0, 0, 0.04),
+    7.23257px 14.5px 31.625px 0px rgba(0, 0, 0, 0.03),
+    11.15882px 22.37143px 54px 0px rgba(0, 0, 0, 0.02);
+
+  &.ActionMenu--right {
+    right: 0;
+  }
+  &.ActionMenu--left {
+    left: 0;
+  }
+
+  .ActionMenu__Button {
+    @apply sui-font-urbanist;
+    display: flex;
+    padding: var(--sui-spacing-0-5) var(--sui-spacing-2);
+    align-items: center;
+    gap: var(--sui-spacing-0-5);
+    height: 2.25rem;
+    color: var(--sui-colors-neutral-text);
+    background: var(--sui-colors-neutral-background);
+    border: 1px solid transparent;
+    text-align: center;
+    font-feature-settings:
+      "clig" off,
+      "liga" off;
+    cursor: pointer;
+    margin: 0;
+
+    /* Desktop/04 Label/Default */
+    @apply sui-text-mobile-4 sui-font-semibold sui-leading-16 sui-tracking-wide t:sui-text-desktop-4;
+
+    &:hover {
+      color: var(--sui-colors-action-text-hover);
+      background: var(--sui-colors-action-background-weak-hover);
+    }
+    &:focus,
+    &:active {
+      color: var(--sui-colors-action-text-pressed);
+      background: var(--sui-colors-action-background-weak-pressed);
+    }
+    &:disabled {
+      color: var(--sui-colors-neutral-text-disabled);
+      background: var(--sui-colors-neutral-background);
+      cursor: not-allowed;
+    }
+    &.ActionMenu__Button--negative {
+      color: var(--sui-colors-negative-text);
+      &:hover {
+        color: white;
+        background-color: var(--sui-colors-negative-background-hover);
+      }
+      &:focus,
+      &:active {
+        color: var(--sui-colors-negative-text-pressed);
+        background-color: var(--sui-colors-negative-background-pressed);
+      }
+      &:disabled {
+        color: var(--sui-colors-negative-text-disabled);
+        opacity: 0.4;
+        background: none;
+      }
+    }
+  }
+}

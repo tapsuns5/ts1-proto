@@ -1,0 +1,29 @@
+.toastEntranceAnimation {
+  animation: toastEntrance 0.25s cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.toastEntranceAnimationBottom {
+  animation: toastEntranceBottom 0.25s cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@keyframes toastEntrance {
+  0% {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toastEntranceBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

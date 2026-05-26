@@ -1,0 +1,38 @@
+.rich-text-editor__container {
+  .tox-editor-header {
+    border-bottom: 1px solid var(--sui-colors-neutral-border) !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .tox-tinymce {
+    border: 1px solid var(--sui-colors-neutral-border) !important;
+    border-radius: 5px !important;
+  }
+
+  .tox-tinymce.error {
+    border-color: var(--sui-colors-red) !important;
+  }
+
+  .tox-toolbar__group {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+  }
+
+  .tox-toolbar__group {
+    border-right: 1px solid var(--sui-colors-neutral-border) !important;
+  }
+
+  .tox-toolbar {
+    background-image: none !important;
+  }
+
+  /* Hide the status bar via css to show the resize handler */
+  .tox-statusbar {
+    border-top: 0px !important;
+    height: 16px !important;
+  }
+  .tox-statusbar__text-container {
+    display: none !important;
+  }
+}

@@ -1,0 +1,22 @@
+.Icon {
+  font-family: 'Material Symbols Rounded';
+  font-weight: var(--icon-font-weight, 400);
+  &.filled {
+    font-variation-settings: 'FILL' 1;
+  }
+  &.sz-xs {
+    font-size: var(--icon-font-size-s, 18px);
+  }
+  &.sz-s {
+    font-size: var(--icon-font-size-s, 20px);
+  }
+  &.sz-default {
+    font-size: var(--icon-font-size-default, 24px);
+  }
+  &.sz-l {
+    font-size: var(--icon-font-size-l, 40px);
+  }
+  &.sz-xl {
+    font-size: var(--icon-font-size-xl, 48px);
+  }
+}

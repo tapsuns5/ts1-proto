@@ -1,0 +1,40 @@
+.banner {
+  @apply sui-flex sui-items-center sui-rounded sui-p-1;
+}
+
+.banner--warning {
+  @apply sui-bg-caution-background;
+}
+
+.banner--info {
+  @apply sui-bg-info-background-weak;
+}
+
+.banner--negative {
+  @apply sui-bg-negative-background-weak;
+}
+
+.banner--success {
+  @apply sui-bg-positive-background;
+}
+
+.banner--neutral {
+  @apply sui-bg-neutral-background-weak;
+}
+
+.banner--IconContainer {
+  @apply sui-mr-1 sui-grid sui-place-items-center sui-p-1;
+}
+
+.banner--content {
+  @apply sui-flex-1;
+}
+
+.banner--content-title {
+  @apply sui-heading-md;
+}
+
+.banner--content-actions,
+.banner--content-caption {
+  @apply sui-text-caption;
+}

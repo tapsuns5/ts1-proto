@@ -1,0 +1,53 @@
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 2.8125rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  appearance: none;
+  background: var(--sui-colors-neutral-background-strong);
+  border-radius: 0.75rem;
+  &::before {
+    content: 'off';
+    height: 1.25rem;
+    line-height: 1.25rem;
+    position: absolute;
+    right: 0.5rem;
+    top: 0;
+    bottom: 0;
+  }
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    background: var(--sui-colors-neutral-background);
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    top: 0.125rem;
+    bottom: 0.125rem;
+    left: 0.125rem;
+  }
+  &:checked {
+    background: var(--sui-colors-positive-background-strong);
+    &::before {
+      content: 'on';
+      color: var(--sui-colors-neutral-text-inverse);
+      right: auto;
+      left: 0.5rem;
+    }
+    &::after {
+      right: 0.125rem;
+      left: auto;
+    }
+  }
+  &:disabled {
+    background: var(--sui-colors-neutral-background-weak-disabled);
+    &::before {
+      color: var(--sui-colors-neutral-text-disabled);
+    }
+    &::after {
+      background: var(--sui-colors-neutral-background);
+    }
+  }
+}

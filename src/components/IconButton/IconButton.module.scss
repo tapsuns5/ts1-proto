@@ -1,0 +1,61 @@
+.IconButton {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  cursor: pointer;
+
+  background: var(--sui-colors-background-white);
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--sui-colors-action-icon);
+
+  &.bordered {
+    border: 1px solid var(--sui-colors-neutral-border);
+  }
+
+  &:hover:not([disabled]) {
+    background: var(--sui-colors-neutral-background-weak);
+    border-color: transparent;
+  }
+
+  &:disabled {
+    color: var(--sui-colors-neutral-icon-disabled);
+    cursor: default;
+    border-color: transparent;
+  }
+
+  &:active:not([disabled]) {
+    font-variation-settings: 'FILL' 1;
+    border-color: transparent;
+  }
+
+  &.sentiment-neutral {
+    color: var(--sui-colors-neutral-icon-medium);
+    &:hover {
+      background: var(--sui-colors-neutral-background-weak);
+    }
+
+    &:active {
+      color: var(--sui-colors-action-icon);
+    }
+
+    &:disabled {
+      color: var(--sui-colors-neutral-icon-disabled);
+    }
+  }
+
+  &.sentiment-negative {
+    color: var(--sui-colors-negative-icon);
+    &:hover {
+      background: var(--sui-colors-neutral-background-weak);
+    }
+
+    &:disabled {
+      color: var(--sui-colors-neutral-icon-disabled);
+    }
+  }
+}

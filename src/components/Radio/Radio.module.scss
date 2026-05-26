@@ -1,0 +1,58 @@
+.radio {
+  @apply sui-text-mobile-5 sui-leading-24 t:sui-text-desktop-5;
+  display: flex;
+  align-items: center;
+  gap: var(--sui-spacing-1);
+
+  label {
+    color: var(--sui-colors-neutral-text);
+    cursor: pointer;
+  }
+  input {
+    display: flex;
+    width: 1rem;
+    height: 1rem;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    /* veritcally align with label */
+    margin-top: -1px;
+    appearance: none;
+    border: 1px solid var(--sui-colors-neutral-icon-medium); /* Add a border */
+    border-radius: 50%; /* Make it round */
+    position: relative; /* Position for pseudo-element */
+    outline: none; /* Remove outline */
+    vertical-align: middle; /* Adjust vertical alignment */
+    box-sizing: border-box;
+
+    &:after {
+      content: "";
+      display: block;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+    }
+
+    &:checked {
+      border-color: var(--sui-colors-action-icon);
+      &:after {
+        background-color: var(--sui-colors-action-icon);
+      }
+      &:disabled {
+        &:after {
+          background-color: var(--sui-colors-neutral-icon-disabled);
+        }
+      }
+    }
+    &:hover {
+      border-color: var(--sui-colors-action-icon-hover);
+    }
+    &:focus,
+    &:active {
+      border-color: var(--sui-colors-action-icon-pressed);
+    }
+    &:disabled {
+      border-color: var(--sui-colors-neutral-icon-disabled);
+    }
+  }
+}

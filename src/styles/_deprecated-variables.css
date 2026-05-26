@@ -1,0 +1,146 @@
+:root {
+  /* DEPRECATED SEMANTIC COLOR TOKENS */
+  /* --- Accent Variables --- */
+  --sui-colors-accent-background: var(--color-accent-background);
+  --sui-colors-accent-background-weak: var(--color-accent-background-weak);
+  --sui-colors-accent-border-weak: var(--color-accent-border-weak);
+
+  /* --- Action Variables --- */
+  --sui-colors-action-background: var(--color-admin-action-background);
+  --sui-colors-action-background-hover: var(
+    --color-admin-action-background-hover
+  );
+  --sui-colors-action-background-pressed: var(
+    --color-admin-action-background-pressed
+  );
+  --sui-colors-action-background-weak-hover: var(
+    --color-admin-action-background-weak-hover
+  );
+  --sui-colors-action-background-weak-pressed: var(
+    --color-admin-action-background-weak-pressed
+  );
+  --sui-colors-action-border: var(--color-admin-action-border);
+  --sui-colors-action-border-hover: var(--color-admin-action-border-hover);
+  --sui-colors-action-border-pressed: var(--color-admin-action-border-pressed);
+  --sui-colors-action-icon: var(--color-admin-action-icon);
+  --sui-colors-action-icon-hover: var(--color-admin-action-icon-hover);
+  --sui-colors-action-icon-pressed: var(--color-admin-action-icon-pressed);
+  --sui-colors-action-text: var(--color-admin-action-text);
+  --sui-colors-action-text-hover: var(--color-admin-action-text-hover);
+  --sui-colors-action-text-pressed: var(--color-admin-action-text-pressed);
+
+  /* --- Brand Variables --- */
+  --sui-colors-brand-background: var(--color-brand-background);
+
+  /* --- Info Variables --- */
+  --sui-colors-info-background: var(--color-info-background);
+  --sui-colors-info-icon: var(--color-info-icon);
+  --sui-colors-info-text: var(--color-info-text);
+  --sui-colors-info-border: var(--color-info-border);
+
+  /* --- Negative Variables --- */
+  --sui-colors-negative-background: var(--color-negative-background);
+  --sui-colors-negative-background-hover: var(
+    --color-negative-background-hover
+  );
+  --sui-colors-negative-background-pressed: var(
+    --color-negative-background-pressed
+  );
+  --sui-colors-negative-border: var(--color-negative-border);
+  --sui-colors-negative-border-hover: var(--color-negative-border-hover);
+  --sui-colors-negative-border-pressed: var(--color-negative-border-pressed);
+  --sui-colors-negative-icon: var(--color-negative-icon);
+  --sui-colors-negative-icon-hover: var(--color-negative-icon-hover);
+  --sui-colors-negative-icon-pressed: var(--color-negative-icon-pressed);
+  --sui-colors-negative-text: var(--color-negative-text);
+  --sui-colors-negative-text-hover: var(--color-negative-text-hover);
+  --sui-colors-negative-text-pressed: var(--color-negative-text-pressed);
+
+  /* --- Neutral Variables --- */
+  --sui-colors-neutral-background: var(--color-neutral-background);
+  --sui-colors-neutral-background-disabled: var(
+    --color-neutral-background-disabled
+  );
+  --sui-colors-neutral-background-medium: var(
+    --color-neutral-background-medium
+  );
+  --sui-colors-neutral-background-strong: var(
+    --color-neutral-background-strong
+  );
+  --sui-colors-neutral-background-weak: var(--color-neutral-background-weak);
+  --sui-colors-neutral-background-weak-disabled: var(
+    --color-neutral-background-weak-disabled
+  );
+  --sui-colors-neutral-border: var(--color-neutral-border);
+  --sui-colors-neutral-border-medium: var(--color-neutral-border-medium);
+  --sui-colors-neutral-border-disabled: var(--color-neutral-border-disabled);
+  --sui-colors-neutral-icon: var(--color-neutral-icon);
+  --sui-colors-neutral-icon-disabled: var(--color-neutral-icon-disabled);
+  --sui-colors-neutral-icon-inverse: var(--color-neutral-icon-inverse);
+  --sui-colors-neutral-icon-medium: var(--color-neutral-icon-medium);
+  --sui-colors-neutral-text: var(--color-neutral-text);
+  --sui-colors-neutral-text-disabled: var(--color-neutral-text-disabled);
+  --sui-colors-neutral-text-inverse: var(--color-neutral-text-inverse);
+  --sui-colors-neutral-text-medium: var(--color-neutral-text-medium);
+  --sui-colors-neutral-text-weak: var(--color-neutral-text-weak);
+
+  /* --- Positive Variables --- */
+  --sui-colors-positive-background: var(--color-positive-background);
+  --sui-colors-positive-background-hover: var(
+    --color-positive-background-hover
+  );
+  --sui-colors-positive-background-pressed: var(
+    --color-positive-background-pressed
+  );
+  --sui-colors-positive-background-weak-hover: var(
+    --color-positive-background-weak-hover
+  );
+  --sui-colors-positive-background-weak-pressed: var(
+    --color-positive-background-weak-pressed
+  );
+  --sui-colors-positive-border: var(--color-positive-border);
+  --sui-colors-positive-border-hover: var(--color-positive-border-hover);
+  --sui-colors-positive-border-pressed: var(--color-positive-border-pressed);
+  --sui-colors-positive-icon: var(--color-positive-icon);
+  --sui-colors-positive-icon-hover: var(--color-positive-icon-hover);
+  --sui-colors-positive-icon-pressed: var(--color-positive-icon-pressed);
+  --sui-colors-positive-text: var(--color-positive-text);
+  --sui-colors-positive-text-hover: var(--color-positive-text-hover);
+  --sui-colors-positive-text-pressed: var(--color-positive-text-pressed);
+
+  /* Hardcore Match */
+  --sui-colors-negative-background-strong: var(--color-negative-border);
+  --sui-colors-negative-background-strong-hover: var(
+    --color-negative-text-hover
+  );
+  --sui-colors-negative-background-strong-pressed: var(
+    --color-negative-text-pressed
+  );
+  --sui-colors-action-background-weak: var(
+    --color-admin-action-background-weak-hover
+  );
+  --sui-colors-negative-background-disabled: var(
+    --color-negative-background-hover
+  );
+  --sui-colors-negative-border-disabled: var(--color-negative-text);
+  --sui-colors-negative-icon-disabled: var(--color-negative-text);
+  --sui-colors-negative-text-disabled: var(--color-negative-text);
+  --sui-colors-positive-background-disabled: var(
+    --color-positive-background-weak
+  );
+  --sui-colors-positive-border-disabled: var(--color-positive-background-weak);
+  --sui-colors-positive-icon-disabled: var(--color-positive-background-weak);
+  --sui-colors-positive-text-disabled: var(--color-positive-background-weak);
+
+  /* Deprecated variables that don't have a direct match, we are just assigning the old values */
+  --sui-colors-negative-background-medium-hover: #e8301c;
+  --sui-colors-neutral-border-weak: #999999;
+  --sui-colors-positive-background-strong: #136f06;
+  --sui-colors-positive-background-strong-hover: #1a9608;
+  --sui-colors-positive-background-strong-pressed: #0f5705;
+  --sui-colors-positive-background-strong-disabled: #b5ebad;
+  --sui-colors-warning-background: #feed90;
+  --sui-colors-warning-icon: #655601;
+  --sui-colors-warning-text: #655601;
+  --sui-colors-warning-border: #fcd603;
+}

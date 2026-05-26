@@ -1,0 +1,27 @@
+.fade-left {
+  background: linear-gradient(to right, white, var(--sui-colors-blue-2));
+  opacity: 0.5;
+}
+
+.fade-right {
+  background: linear-gradient(to left, white, var(--sui-colors-blue-2));
+  opacity: 0.5;
+}
+
+.react-datepicker__day {
+  width: 40px !important;
+  height: 40px !important;
+  margin: 0 !important;
+  line-height: 40px !important;
+}
+
+.react-datepicker__day:hover {
+  border-radius: 50%;
+}
+
+.react-datepicker__day-name {
+  width: 40px !important;
+  height: 40px !important;
+  line-height: 40px !important;
+  margin: 0 !important;
+}

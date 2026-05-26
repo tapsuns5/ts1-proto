@@ -1,0 +1,72 @@
+.modal {
+  @apply sui-fixed;
+  z-index: 1000;
+}
+
+.ModalContainer {
+  @apply sui-p-3;
+  @apply sui-rounded;
+  @apply sui-shadow-up;
+  @apply sui-fixed;
+  background-color: var(--sui-colors-neutral-background);
+  z-index: 1000;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 31.25rem;
+  max-height: calc(100vh - 3.125rem);
+  display: flex;
+  overflow: auto;
+
+  &.ModalContainer--size-large {
+    max-width: 48rem;
+  }
+
+  .ModalContainer__close-button {
+    @apply sui-absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 1001;
+  }
+}
+.modal-screen-overlay {
+  @apply sui-bg-black;
+  @apply sui-opacity-25;
+  @apply sui-fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 900;
+}
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.modal-fade-in {
+  animation: fadeIn ease-in-out 150ms;
+}
+.modal-fade-out {
+  opacity: 0;
+  animation: fadeOut ease-in-out 150ms;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
