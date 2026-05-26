@@ -1,5 +1,5 @@
 import React from "react";
-import Person from "../../assets/Icons/Person";
+import Person from "../assets/Icons/Person";
 import classes from "./Avatar.module.scss";
 import { AvatarProps } from "./Avatar.types";
 

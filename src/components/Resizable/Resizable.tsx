@@ -1,17 +1,13 @@
 import * as React from "react";
 import * as ResizablePrimitive from "react-resizable-panels";
-import { ImperativePanelGroupHandle, PanelGroupProps } from "react-resizable-panels";
-import { Icon } from "../../index";
+import { GroupProps } from "react-resizable-panels";
+import { Icon } from "../assets/Icons";
 import { cn } from "../../utils";
 
 const ResizablePanelGroup: React.ForwardRefExoticComponent<
-  PanelGroupProps & React.RefAttributes<ImperativePanelGroupHandle>
-> = React.forwardRef<
-  ImperativePanelGroupHandle,
-  PanelGroupProps
->(({ className, ...props }, ref) => (
-  <ResizablePrimitive.PanelGroup
-    ref={ref}
+  GroupProps & React.RefAttributes<any>
+> = React.forwardRef<any, GroupProps>(({ className, ...props }, ref) => (
+  <ResizablePrimitive.Group
     className={cn(
       "sui-flex sui-h-full sui-w-full data-[panel-group-direction=vertical]:sui-flex-col",
       className,
@@ -27,10 +23,10 @@ const ResizableHandle = ({
   withHandle,
   className,
   ...props
-}: React.ComponentPropsWithoutRef<typeof ResizablePrimitive.PanelResizeHandle> & {
+}: React.ComponentPropsWithoutRef<typeof ResizablePrimitive.Panel> & {
   withHandle?: boolean;
 }) => (
-  <ResizablePrimitive.PanelResizeHandle
+  <ResizablePrimitive.Panel
     className={cn(
       [
         "sui-relative sui-flex sui-w-2 sui-items-center sui-justify-center",
@@ -47,10 +43,10 @@ const ResizableHandle = ({
   >
     {withHandle && (
       <div className="sui-z-10 sui-flex sui-h-4 sui-w-2 sui-items-center sui-justify-center sui-rounded-sm sui-bg-neutral-background-medium sui-py-1 sui-text-neutral-icon-weak">
-        <Icon name="more_vert" aria-label="Handle to resize panel" size="s" />
+        <Icon name="MoreHoriz" aria-label="Handle to resize panel" />
       </div>
     )}
-  </ResizablePrimitive.PanelResizeHandle>
+  </ResizablePrimitive.Panel>
 );
 ResizableHandle.displayName = "ResizableHandle";
 

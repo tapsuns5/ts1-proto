@@ -155,7 +155,7 @@ const TimeColumn = React.forwardRef<HTMLDivElement, TimeColumnProps<any>>(
           return (
             <div
               key={option}
-              ref={(el) => (optionRefs.current[index] = el)}
+              ref={(el) => { optionRefs.current[index] = el; }}
               role="option"
               aria-selected={isSelected}
               onClick={() => onChange(option)}

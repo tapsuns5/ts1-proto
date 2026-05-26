@@ -196,15 +196,16 @@ export function findComboboxItemsRecursively(
     }
     // Check the basic type of the child to see if it's a ComboboxItem.
     if (ComboboxItemComponent && child.type === ComboboxItemComponent) {
+      const props = child.props as { value: string; label: string; keywords?: string | string[] };
       items.push({
-        value: child.props.value,
-        label: child.props.label,
-        keywords: child.props.keywords,
+        value: props.value,
+        label: props.label,
+        keywords: typeof props.keywords === 'string' ? [props.keywords] : props.keywords,
       });
     }
     // Find items recursively so we can handle nested ComboboxItem components.
-    if (child.props.children) {
-      items = items.concat(findComboboxItemsRecursively(child.props.children, ComboboxItemComponent));
+    if ((child.props as any).children) {
+      items = items.concat(findComboboxItemsRecursively((child.props as any).children, ComboboxItemComponent));
     }
   });
   return items;

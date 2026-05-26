@@ -35,7 +35,7 @@ type ComboboxContextProps = {
   handleOnSave: () => void;
   search: string;
   setSearch: (value: string) => void;
-  comboboxSearchInputRef: React.RefObject<HTMLInputElement>;
+  comboboxSearchInputRef: React.RefObject<HTMLInputElement | null>;
   allValuesAndLabels: { value: string; label: string }[];
   resetInput: () => void;
   disablePortal?: boolean;

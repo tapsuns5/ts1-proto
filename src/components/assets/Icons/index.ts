@@ -11,3 +11,6 @@ export { default as TooltipArrow } from './TooltipArrow';
 export { default as UncheckedCheckbox } from './UncheckedCheckbox';
 export { default as VisibilityOff } from './VisibilityOff';
 export { default as Visibility } from './Visibility';
+export { default as Icon } from './Icon';
+export { default as ChevronRight } from './ChevronRight';
+export { default as MoreHoriz } from './MoreHoriz';

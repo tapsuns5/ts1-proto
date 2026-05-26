@@ -35,10 +35,11 @@ const ComboboxGroup = forwardRef<HTMLDivElement, ComboboxGroupProps>(
     const childItemsValuesAndLabels = useMemo(() => {
       return React.Children.map(props.children, (child) => {
         if (React.isValidElement(child)) {
+          const childProps = child.props as { value: string; label: string; keywords?: string | string[] };
           return {
-            value: child.props.value,
-            label: child.props.label,
-            keywords: child.props.keywords,
+            value: childProps.value,
+            label: childProps.label,
+            keywords: typeof childProps.keywords === 'string' ? [childProps.keywords] : childProps.keywords,
           };
         }
         return null;

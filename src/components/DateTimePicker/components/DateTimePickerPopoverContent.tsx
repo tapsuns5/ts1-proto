@@ -151,7 +151,7 @@ export function DateTimePickerPopoverContent({
             return (
               <button
                 key={month}
-                ref={(el) => (monthRefs.current[index] = el)}
+                ref={(el) => { monthRefs.current[index] = el; }}
                 onClick={() => handleMonthSelect(index)}
                 className={cn(
                   "sui-rounded sui-px-4 sui-py-2 hover:sui-bg-neutral-background",
@@ -180,7 +180,7 @@ export function DateTimePickerPopoverContent({
             return (
               <button
                 key={year}
-                ref={(el) => (yearRefs.current[index] = el)}
+                ref={(el) => { yearRefs.current[index] = el; }}
                 onClick={() => handleYearSelect(year)}
                 className={cn(
                   "sui-rounded sui-px-4 sui-py-2 hover:sui-bg-neutral-background",

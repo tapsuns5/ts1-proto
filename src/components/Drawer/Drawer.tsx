@@ -106,7 +106,7 @@ const Drawer: React.FC<DrawerProps> & {
     }
   }, [allowOverlayClose, onClickOutside, open]);
 
-  useOnClickOutside(ref, handleClickOutside);
+  useOnClickOutside(ref as React.RefObject<HTMLElement>, handleClickOutside);
 
   React.useEffect(() => {
     setIsBodyScrollLocked(!allowBodyScroll && open);

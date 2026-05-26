@@ -38,7 +38,7 @@ const DatePicker = React.forwardRef<
       ...props
     },
     ref,
-  ): JSX.Element => {
+  ): React.ReactElement => {
     const [openPopover, setOpenPopover] = React.useState(false);
     // Used to store the date value locally until "Apply" is clicked
     const [tempDateValue, setTempDateValue] = useState<

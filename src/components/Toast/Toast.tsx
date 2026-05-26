@@ -116,7 +116,7 @@ const ToastProvider = ({
 }: {
   position?: ToastPosition;
   className?: string;
-}): JSX.Element => {
+}): React.ReactElement => {
   const { toasts } = useToast();
 
   // Filter toasts to only show ones for this position

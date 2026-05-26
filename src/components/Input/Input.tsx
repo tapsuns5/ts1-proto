@@ -90,8 +90,7 @@ const Input = React.forwardRef<
       el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null,
     ) => {
       // Assign to inputRef
-      // @ts-expect-error //TODO: remove this once we separate each input type into its own component
-      inputRef.current = el;
+            inputRef.current = el;
       // Assign to the forwarded ref (which can be a function or object)
       if (typeof ref === "function") {
         ref(el);

@@ -42,10 +42,10 @@ export function CopiedTooltip({
   };
 
   const childWithOnClick = isValidElement(children)
-    ? cloneElement(children as ReactElement, {
+    ? cloneElement(children as ReactElement<any>, {
         onClick: (e: React.MouseEvent) => {
-          if (typeof children.props.onClick === 'function' && !disabled) {
-            children.props.onClick(e);
+          if (typeof (children.props as any).onClick === 'function' && !disabled) {
+            (children.props as any).onClick(e);
           }
           handleCopy();
         },

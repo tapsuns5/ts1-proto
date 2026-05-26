@@ -1,5 +1,5 @@
 import { forwardRef, memo, useMemo } from "react";
-import { Editor } from "@tinymce/tinymce-react";
+// import { Editor } from "@tinymce/tinymce-react";
 import { cn } from "../../utils";
 import { RichTextEditorProps } from "./RichTextEditor.types";
 
@@ -39,7 +39,7 @@ const defaultConfig = {
   */
 
 const RichTextEditor = memo(
-  forwardRef<Editor, RichTextEditorProps>(
+  forwardRef<any, RichTextEditorProps>(
     (
       {
         className = "",
@@ -71,7 +71,7 @@ const RichTextEditor = memo(
           data-testid="rich-text-editor-component"
           className={cn("rich-text-editor__container", className)}
         >
-          <Editor
+          {/* <Editor
             ref={ref}
             apiKey={tinymceApiKey}
             onChange={onChange}
@@ -79,7 +79,10 @@ const RichTextEditor = memo(
             initialValue={initialValue}
             init={editorConfig}
             {...props}
-          />
+          /> */}
+          <div className="sui-p-4 sui-text-center sui-text-neutral-text-weak">
+            Rich Text Editor (TinyMCE not available)
+          </div>
         </div>
       );
     },

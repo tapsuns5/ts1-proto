@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
 import { Columns } from "../Table/Table.types";
 import { TableCellProps, TableCellType } from "../TableCell/TableCell.types";
 import { TableRowProps } from "../TableRow/TableRow.types";
@@ -145,7 +145,7 @@ export const CELLS_WITH_ACTIONS_2: TableCellProps[] = [
 ];
 
 export const getRowPropsDefault = (): TableRowProps => ({
-  __id: uuidv4(),
+  __id: self.crypto.randomUUID(),
   cells: CELLS,
 });
 export const ROW_PROPS_HEADER: TableRowProps = {
@@ -166,7 +166,7 @@ export const ROW_PROPS_HEADER_ACTIONS: TableRowProps = {
 };
 
 export const ROW_PROPS_EXPANDABLE: TableRowProps = {
-  __id: uuidv4(),
+  __id: self.crypto.randomUUID(),
   cells: [
     {
       ...CELL_TEXT,

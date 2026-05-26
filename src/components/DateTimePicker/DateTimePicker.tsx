@@ -43,7 +43,7 @@ const DateTimePicker = React.forwardRef<HTMLInputElement, DateTimePickerProps>(
 			...props
 		},
 		ref,
-	): JSX.Element => {
+	): React.ReactElement => {
 		const [openPopover, setOpenPopover] = useState(false);
 		const [tempDateValue, setTempDateValue] = useState<Date | null>(
 			value ?? null,

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { Icon } from "../../index";
+import { Icon } from "../assets/Icons";
 import { cn } from "../../utils";
 
 const Breadcrumb = React.forwardRef<
@@ -104,7 +104,7 @@ const BreadcrumbSeparator = React.forwardRef<
       {...props}
     >
       {children ?? (
-        <Icon name="chevron_right" className="sui-relative sui-top-[4px]" />
+        <Icon name="ChevronRight" className="sui-relative sui-top-[4px]" />
       )}
     </li>
   );
@@ -127,7 +127,7 @@ const BreadcrumbEllipsis = React.forwardRef<
       ref={ref}
       {...props}
     >
-      <Icon name="more_horiz" />
+      <Icon name="MoreHoriz" />
       <span className="sui-sr-only">More</span>
     </span>
   );
