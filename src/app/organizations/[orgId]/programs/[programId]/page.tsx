@@ -126,10 +126,10 @@ export default function ProgramPage() {
       onHelpClick={() => console.log("Help clicked")}
     >
       <ProgramHeader
-        programName="Test Program"
-        status="past"
-        startDate="Jan 1, 2024"
-        endDate="Jan 1, 2026"
+        programName="FTL Optimist Baseball League Spring"
+        status="active"
+        startDate="Jan 1, 2026"
+        endDate="Dec 31, 2026"
         onEdit={() => console.log("Edit program")}
         onArchive={() => console.log("Archive program")}
         onRostering={() => console.log("Go to rostering")}

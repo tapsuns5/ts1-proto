@@ -10,13 +10,21 @@ export interface CreatedSchedule {
 const SCHEDULES_KEY = 'auto-scheduler-c-schedules';
 const EVENTS_KEY = 'auto-scheduler-c-events';
 
+const MOCK_SCHEDULES: CreatedSchedule[] = [
+  { id: 'sched-spring', name: 'Spring 2025', createdAt: new Date().toISOString(), status: 'published' },
+  { id: 'sched-summer', name: 'Summer 2025', createdAt: new Date().toISOString(), status: 'draft' },
+  { id: 'sched-fall', name: 'Fall 2025', createdAt: new Date().toISOString(), status: 'draft' },
+  { id: 'sched-tourney', name: 'Tournament 2025', createdAt: new Date().toISOString(), status: 'published' },
+];
+
 export function getCreatedSchedules(): CreatedSchedule[] {
   try {
     const raw = localStorage.getItem(SCHEDULES_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw) as CreatedSchedule[];
+    if (!raw) return MOCK_SCHEDULES;
+    const parsed = JSON.parse(raw) as CreatedSchedule[];
+    return parsed.length > 0 ? parsed : MOCK_SCHEDULES;
   } catch {
-    return [];
+    return MOCK_SCHEDULES;
   }
 }
 

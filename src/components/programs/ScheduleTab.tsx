@@ -63,6 +63,11 @@ function generateMockEvents(): ScheduleEvent[] {
   ];
   const venues = ['Main Stadium', 'Field A', 'Field B', 'Community Center'];
   const subvenues = ['Field 1', 'Primary', 'Secondary', 'Gym'];
+  const scheduleNames = ['Spring 2025', 'Summer 2025', 'Fall 2025', 'Tournament 2025'];
+
+  // Check which schedules are already published in localStorage
+  const schedules = getCreatedSchedules();
+  const publishedNames = new Set(schedules.filter((s) => s.status === 'published').map((s) => s.name));
 
   // 4 coaches for 8 teams so each coach handles 2 teams → guaranteed conflicts
   const teamToCoach: Record<string, string> = {};
@@ -71,27 +76,32 @@ function generateMockEvents(): ScheduleEvent[] {
     teamToCoach[team] = coaches[Math.floor(idx / 2)];
   });
 
+  // Generate 8 weeks of dates (Sat/Sun games, plus some weekday practices)
+  const weeks: string[] = [];
+  const baseDate = new Date(2025, 3, 5); // Apr 5, 2025
+  for (let w = 0; w < 8; w++) {
+    const sat = new Date(baseDate);
+    sat.setDate(baseDate.getDate() + w * 7);
+    const sun = new Date(sat);
+    sun.setDate(sat.getDate() + 1);
+    weeks.push(
+      sat.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+      sun.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+    );
+  }
+
   const mockEvents: ScheduleEvent[] = [];
   let idCounter = 1;
 
-  // Create 2 games at the SAME time on the SAME day using different venues
-  // Each coach handles 2 teams, so cross-game conflicts are guaranteed
+  // Week 1: guaranteed coach conflicts (2 games at same time)
   const conflictSlots = [
-    { date: 'Sat, Apr 5, 2025', time: '09:00 AM', games: [
-      { home: 0, away: 2, venue: 0 }, // Thunder Hawks(Mike) vs Blue Strikers(Sarah)
-      { home: 1, away: 3, venue: 1 }, // Red Wolves(Mike) vs Green Gators(Sarah) → Mike & Sarah conflict
+    { date: weeks[0], time: '09:00 AM', games: [
+      { home: 0, away: 2, venue: 0 },
+      { home: 1, away: 3, venue: 1 },
     ]},
-    { date: 'Sat, Apr 5, 2025', time: '11:00 AM', games: [
-      { home: 4, away: 6, venue: 2 }, // Silver Sharks(Dave) vs Storm Breakers(Lisa)
-      { home: 5, away: 7, venue: 3 }, // Golden Eagles(Dave) vs Iron Rhinos(Lisa) → Dave & Lisa conflict
-    ]},
-    { date: 'Sun, Apr 6, 2025', time: '09:00 AM', games: [
-      { home: 0, away: 4, venue: 0 }, // Thunder Hawks(Mike) vs Silver Sharks(Dave)
-      { home: 2, away: 6, venue: 1 }, // Blue Strikers(Sarah) vs Storm Breakers(Lisa)
-    ]},
-    { date: 'Sun, Apr 6, 2025', time: '11:00 AM', games: [
-      { home: 1, away: 5, venue: 2 }, // Red Wolves(Mike) vs Golden Eagles(Dave)
-      { home: 3, away: 7, venue: 3 }, // Green Gators(Sarah) vs Iron Rhinos(Lisa)
+    { date: weeks[0], time: '11:00 AM', games: [
+      { home: 4, away: 6, venue: 2 },
+      { home: 5, away: 7, venue: 3 },
     ]},
   ];
 
@@ -105,42 +115,108 @@ function generateMockEvents(): ScheduleEvent[] {
         type: 'game',
         name: `${teams[g.home]} vs ${teams[g.away]}`,
         team: `${teams[g.home]} vs ${teams[g.away]}`,
-        status: idCounter % 3 === 0 ? 'published' : idCounter % 3 === 1 ? 'draft' : 'canceled',
+        status: publishedNames.has(scheduleNames[0]) ? 'published' : (idCounter % 2 === 0 ? 'published' : 'draft'),
         venue: venues[g.venue],
         subvenue: subvenues[g.venue],
         hasConflict: false,
-        scheduleName: 'Spring 2025',
+        scheduleName: scheduleNames[0],
         coaches: [teamToCoach[teams[g.home]], teamToCoach[teams[g.away]]],
       });
     });
   });
 
-  // Fill remaining days with non-conflicting single games
-  const extraDates = [
-    'Mon, Apr 7, 2025', 'Tue, Apr 8, 2025', 'Wed, Apr 9, 2025',
-    'Thu, Apr 10, 2025', 'Fri, Apr 11, 2025', 'Sat, Apr 12, 2025'
-  ];
-  extraDates.forEach((date, dIdx) => {
-    const home = (dIdx * 2) % teams.length;
-    const away = (home + 4) % teams.length;
+  // Fill all 16 days (8 weeks × 2 days) with 2 games each across all schedules
+  weeks.forEach((date, dayIdx) => {
+    // Skip first Saturday (already has conflict games)
+    if (dayIdx === 0) return;
+
+    const scheduleIdx = Math.floor(dayIdx / 4) % scheduleNames.length;
+    const gameTimes = ['09:00 AM', '11:00 AM'];
+
+    for (let g = 0; g < 2; g++) {
+      const home = (dayIdx * 2 + g) % teams.length;
+      const away = (home + 2) % teams.length;
+      const venueIdx = (dayIdx + g) % venues.length;
+      mockEvents.push({
+        id: `mock-${idCounter++}`,
+        date,
+        time: gameTimes[g],
+        timezone: 'America/New_York',
+        type: 'game',
+        name: `${teams[home]} vs ${teams[away]}`,
+        team: `${teams[home]} vs ${teams[away]}`,
+        status: publishedNames.has(scheduleNames[scheduleIdx]) ? 'published' : 'draft',
+        venue: venues[venueIdx],
+        subvenue: subvenues[venueIdx],
+        hasConflict: false,
+        scheduleName: scheduleNames[scheduleIdx],
+        coaches: [teamToCoach[teams[home]], teamToCoach[teams[away]]],
+      });
+    }
+  });
+
+  // Add Friday evening games
+  const fridayDates: string[] = [];
+  for (let w = 0; w < 8; w++) {
+    const fri = new Date(baseDate);
+    fri.setDate(baseDate.getDate() + w * 7 + 6); // Friday
+    fridayDates.push(
+      fri.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+    );
+  }
+  fridayDates.forEach((date, idx) => {
+    const home = idx % teams.length;
+    const away = (home + 3) % teams.length;
+    const fridaySchedIdx = idx % scheduleNames.length;
     mockEvents.push({
       id: `mock-${idCounter++}`,
       date,
-      time: '01:00 PM',
+      time: '06:00 PM',
       timezone: 'America/New_York',
       type: 'game',
       name: `${teams[home]} vs ${teams[away]}`,
       team: `${teams[home]} vs ${teams[away]}`,
-      status: 'published',
-      venue: venues[dIdx % venues.length],
-      subvenue: subvenues[dIdx % venues.length],
+      status: publishedNames.has(scheduleNames[fridaySchedIdx]) ? 'published' : 'draft',
+      venue: venues[idx % venues.length],
+      subvenue: subvenues[idx % venues.length],
       hasConflict: false,
-      scheduleName: 'Spring 2025',
+      scheduleName: scheduleNames[idx % scheduleNames.length],
       coaches: [teamToCoach[teams[home]], teamToCoach[teams[away]]],
     });
   });
 
-  // Pre-compute coach conflicts (4 guaranteed)
+  // Add weekday practice events
+  const weekdayDates: string[] = [];
+  for (let w = 0; w < 8; w++) {
+    const mon = new Date(baseDate);
+    mon.setDate(baseDate.getDate() + w * 7 + 2);
+    const wed = new Date(baseDate);
+    wed.setDate(baseDate.getDate() + w * 7 + 4);
+    weekdayDates.push(
+      mon.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+      wed.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+    );
+  }
+  weekdayDates.forEach((date, idx) => {
+    const team = teams[idx % teams.length];
+    mockEvents.push({
+      id: `mock-${idCounter++}`,
+      date,
+      time: '06:00 PM',
+      timezone: 'America/New_York',
+      type: 'practice',
+      name: `${team} Practice`,
+      team,
+      status: 'published',
+      venue: venues[idx % venues.length],
+      subvenue: subvenues[idx % venues.length],
+      hasConflict: false,
+      scheduleName: scheduleNames[idx % scheduleNames.length],
+      coaches: [teamToCoach[team]],
+    });
+  });
+
+  // Pre-compute coach conflicts (capped at 4)
   const eventsBySlot: Record<string, typeof mockEvents> = {};
   mockEvents.forEach((e) => {
     const key = `${e.date}|${e.time}`;
@@ -152,12 +228,14 @@ function generateMockEvents(): ScheduleEvent[] {
   const maxConflicts = 4;
   mockEvents.forEach((e) => {
     e.coachConflicts = [];
+    if (e.status === 'canceled') return;
     if (conflictCount >= maxConflicts) return;
     const key = `${e.date}|${e.time}`;
     const sameSlot = eventsBySlot[key] || [];
     const gameTeams = e.team.split(' vs ').map((t) => t.trim());
     sameSlot.forEach((other) => {
       if (other.id === e.id) return;
+      if (other.status === 'canceled') return;
       const otherTeams = other.team.split(' vs ').map((t) => t.trim());
       const otherCoaches = otherTeams.map((t) => teamToCoach[t]);
       gameTeams.forEach((team) => {
@@ -201,6 +279,7 @@ function processCoachConflicts(events: ScheduleEvent[]) {
   const maxCoachConflicts = 4;
 
   events.forEach((e) => {
+    if (e.status === 'canceled') return;
     // Skip if already processed (e.g., mock data has pre-computed conflicts)
     if (e.coaches && e.coaches.length > 0) return;
     const teams = e.team.split(' vs ').map((t: string) => t.trim()).filter(Boolean);
@@ -211,6 +290,7 @@ function processCoachConflicts(events: ScheduleEvent[]) {
     const sameSlot = eventsByDateTime[key] || [];
     sameSlot.forEach((other) => {
       if (other.id === e.id) return;
+      if (other.status === 'canceled') return;
       const otherTeams = other.team.split(' vs ').map((t: string) => t.trim()).filter(Boolean);
       const otherCoaches = otherTeams.map((t: string) => teamCoaches[t]);
       teams.forEach((team: string) => {
@@ -301,10 +381,11 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
   const [isClientLoaded, setIsClientLoaded] = useState(false);
   const [dataReportSheetOpen, setDataReportSheetOpen] = useState(false);
 
-  const loadCardItems = () => {
+  const loadCardItems = (overrideEvents?: ScheduleEvent[]) => {
     const drafts = getDrafts();
     const schedules = getCreatedSchedules();
     const storedEvents = getCreatedEvents();
+    const allAvailableEvents = overrideEvents ?? allEvents;
 
     const items: ScheduleCardItem[] = [];
 
@@ -318,15 +399,27 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
     });
 
     schedules.forEach((s) => {
-      if (s.status === 'published') return;
-      const schedEvents = storedEvents.filter((e: any) => e.scheduleId === s.id);
+      // Try scheduleId first (localStorage events), then scheduleName (mock events)
+      let schedEvents: any[] = storedEvents.filter((e: any) => e.scheduleId === s.id);
+      if (schedEvents.length === 0) {
+        schedEvents = allAvailableEvents.filter((e) => e.scheduleName === s.name);
+      }
+      const hasEvents = schedEvents.length > 0;
+      // Hide card if all events are already published
+      const allPublished = hasEvents && schedEvents.every((e: any) => e.status === 'published');
+      if (allPublished) return;
+
+      // Determine card status: published if any event is published, otherwise draft
+      const eventStatuses = schedEvents.map((e: any) => e.status);
+      const anyPublished = eventStatuses.some((st: string) => st === 'published');
+      const cardStatus = anyPublished ? 'published' : 'draft';
       items.push({
-        type: s.status,
+        type: cardStatus as 'draft' | 'published',
         id: s.id,
         name: s.name,
         subtitle: `Created ${new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
-        draftEventCount: schedEvents.length,
-        draftEventIds: schedEvents.map((e: any) => e.id),
+        draftEventCount: schedEvents.filter((e: any) => e.status !== 'published').length,
+        draftEventIds: schedEvents.filter((e: any) => e.status !== 'published').map((e: any) => e.id),
       });
     });
 
@@ -338,7 +431,7 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
     const combined = [...events, ...loadGeneratedEvents()];
     processCoachConflicts(combined);
     setAllEvents(combined);
-    loadCardItems();
+    loadCardItems(combined);
 
     const schedules = getCreatedSchedules();
     setScheduleOptions(schedules.map((s) => ({ value: s.name, label: s.name })));
@@ -361,8 +454,9 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
           setGenerationProgress(0);
           setShowDraftModal(true);
           setSelectedSchedules([scheduleName]);
-          setAllEvents([...events, ...loadGeneratedEvents()]);
-          loadCardItems();
+          const generated = [...events, ...loadGeneratedEvents()];
+          setAllEvents(generated);
+          loadCardItems(generated);
 
           // Build Game[] from localStorage for the modal
           try {
@@ -475,13 +569,26 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
               const sched = getCreatedSchedules().find((s) => s.id === scheduleId);
               if (sched) {
                 setSelectedSchedules([sched.name]);
-                setAllEvents([...events, ...loadGeneratedEvents()]);
+                // Keep existing allEvents, just filter by schedule
               }
             }}
             onPublish={(scheduleId, eventIds) => {
               updateScheduleStatus(scheduleId, 'published');
-              loadCardItems();
-              setAllEvents([...events, ...loadGeneratedEvents()]);
+              const sched = getCreatedSchedules().find((s) => s.id === scheduleId);
+
+              // Update event statuses to published
+              const updatedEvents = allEvents.map((e) => {
+                if (eventIds.includes(e.id)) {
+                  return { ...e, status: 'published' as const };
+                }
+                if (sched && e.scheduleName === sched.name && e.status !== 'published') {
+                  return { ...e, status: 'published' as const };
+                }
+                return e;
+              });
+
+              setAllEvents(updatedEvents);
+              loadCardItems(updatedEvents);
             }}
             onDelete={(id) => {
               deleteDraft(id);
@@ -980,8 +1087,8 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
 
       <Sheet open={dataReportSheetOpen} onOpenChange={setDataReportSheetOpen}>
         <SheetContent side="right">
-          <DataReport 
-            events={displayEvents} 
+          <DataReport
+            events={allEvents}
             onClose={() => setDataReportSheetOpen(false)}
             initialScheduleFilter={selectedSchedules[0] || "all"}
           />

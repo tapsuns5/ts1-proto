@@ -86,12 +86,22 @@ function ScheduleCard({
           </>
         )}
         {item.type === 'published' && (
-          <SimpleLabelButton
-            type="secondary"
-            size="small"
-            label="View games"
-            onClick={() => onViewGames(item.id)}
-          />
+          <>
+            <SimpleLabelButton
+              type="secondary"
+              size="small"
+              label="View games"
+              onClick={() => onViewGames(item.id)}
+            />
+            {(item.draftEventCount ?? 0) > 0 && (
+              <SimpleLabelButton
+                type="primary"
+                size="small"
+                label={`Publish ${item.draftEventCount}`}
+                onClick={() => onPublish(item.id, item.draftEventIds ?? [])}
+              />
+            )}
+          </>
         )}
       </div>
     </div>
