@@ -9,6 +9,7 @@ export interface ScheduleCardItem {
   id: string;
   name: string;
   subtitle: string;
+  divisions?: string[];
   draftEventCount?: number;
   draftEventIds?: string[];
 }
@@ -38,7 +39,7 @@ function ScheduleCard({
     <div className="sui-border sui-border-neutral-border sui-rounded-2xl sui-bg-white sui-p-2 sui-flex sui-flex-col sui-gap-1">
       <div className="sui-flex sui-items-start sui-justify-between sui-gap-2">
         <div className="sui-min-w-0">
-          <div className="sui-text-label sui-font-semibold sui-text-neutral-text sui-truncate">{item.name}</div>
+          <div className="sui-text-label sui-font-normal sui-text-neutral-text sui-truncate">{item.name}</div>
           <div className="sui-text-caption sui-text-neutral-text-medium">{item.subtitle}</div>
         </div>
         {item.type === 'in-progress' && (
@@ -63,6 +64,7 @@ function ScheduleCard({
               type="primary"
               size="small"
               label="Continue setup"
+              className="!sui-font-normal !sui-text-label"
               onClick={() => onContinueSetup(item.id)}
             />
           </>
@@ -73,6 +75,7 @@ function ScheduleCard({
               type="secondary"
               size="small"
               label="View games"
+              className="!sui-font-normal !sui-text-label"
               onClick={() => onViewGames(item.id)}
             />
             {(item.draftEventCount ?? 0) > 0 && (
@@ -80,6 +83,7 @@ function ScheduleCard({
                 type="primary"
                 size="small"
                 label={`Publish ${item.draftEventCount}`}
+                className="!sui-font-normal !sui-text-label"
                 onClick={() => onPublish(item.id, item.draftEventIds ?? [])}
               />
             )}
@@ -91,6 +95,7 @@ function ScheduleCard({
               type="secondary"
               size="small"
               label="View games"
+              className="!sui-font-normal !sui-text-label"
               onClick={() => onViewGames(item.id)}
             />
             {(item.draftEventCount ?? 0) > 0 && (
@@ -98,6 +103,7 @@ function ScheduleCard({
                 type="primary"
                 size="small"
                 label={`Publish ${item.draftEventCount}`}
+                className="!sui-font-normal !sui-text-label"
                 onClick={() => onPublish(item.id, item.draftEventIds ?? [])}
               />
             )}

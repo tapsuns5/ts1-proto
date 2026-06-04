@@ -417,7 +417,8 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
         type: cardStatus as 'draft' | 'published',
         id: s.id,
         name: s.name,
-        subtitle: `Created ${new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
+        subtitle: s.divisions && s.divisions.length > 0 ? s.divisions.join(', ') : `Created ${new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
+        divisions: s.divisions,
         draftEventCount: schedEvents.filter((e: any) => e.status !== 'published').length,
         draftEventIds: schedEvents.filter((e: any) => e.status !== 'published').map((e: any) => e.id),
       });
@@ -539,6 +540,7 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
       : allEvents;
 
   const coachConflictCount = displayEvents.filter((e) => e.coachConflicts && e.coachConflicts.length > 0).length;
+  const venueConflictCount = displayEvents.filter((e) => e.hasConflict).length;
 
   const groupedEvents = displayEvents.reduce((acc, event) => {
     if (!acc[event.date]) {
@@ -695,11 +697,11 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
                   </DropdownMenuContent>
                 </DropdownMenuPortal>
               </DropdownMenu>
-              <SimpleLabelButton 
-                type="primary" 
-                size="small" 
-                label="Create Schedule" 
-                className="sui-flex-shrink-0" 
+              <SimpleLabelButton
+                type="primary"
+                size="small"
+                label="Create Schedule"
+                className="sui-flex-shrink-0 !sui-font-normal !sui-text-label"
                 onClick={() => setScheduleWizardOpen(true)}
               />
             </div>
@@ -865,12 +867,14 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
                 <th className="sui-p-2 sui-text-left sui-align-middle [&:has([role=checkbox])]:sui-pr-0 sui-text-label !sui-font-semibold sui-min-h-[44px] sui-font-bold">
                   <div className="sui-flex sui-items-center sui-gap-2">
                     Venue
-                    <Badge
-                      labelText="2 Venue Conflicts"
-                      variant="caution1"
-                      className="sui-cursor-pointer sui-hover:opacity-80 sui-whitespace-nowrap"
-                      onClick={() => handleConflictBadgeClick()}
-                    />
+                    {venueConflictCount > 0 && (
+                      <Badge
+                        labelText={`${venueConflictCount} Venue Conflict${venueConflictCount > 1 ? 's' : ''}`}
+                        variant="caution1"
+                        className="sui-cursor-pointer sui-hover:opacity-80 sui-whitespace-nowrap"
+                        onClick={() => handleConflictBadgeClick()}
+                      />
+                    )}
                   </div>
                 </th>
                 <th className="sui-p-2 sui-text-left sui-align-middle [&:has([role=checkbox])]:sui-pr-0 sui-text-label !sui-font-semibold sui-min-h-[44px] sui-font-bold sui-w-[60px]">

@@ -5,16 +5,17 @@ export interface CreatedSchedule {
   name: string;
   createdAt: string;
   status: 'draft' | 'published';
+  divisions?: string[];
 }
 
 const SCHEDULES_KEY = 'auto-scheduler-c-schedules';
 const EVENTS_KEY = 'auto-scheduler-c-events';
 
 const MOCK_SCHEDULES: CreatedSchedule[] = [
-  { id: 'sched-spring', name: 'Spring 2025', createdAt: new Date().toISOString(), status: 'published' },
-  { id: 'sched-summer', name: 'Summer 2025', createdAt: new Date().toISOString(), status: 'draft' },
-  { id: 'sched-fall', name: 'Fall 2025', createdAt: new Date().toISOString(), status: 'draft' },
-  { id: 'sched-tourney', name: 'Tournament 2025', createdAt: new Date().toISOString(), status: 'published' },
+  { id: 'sched-spring', name: 'Spring 2025', createdAt: new Date().toISOString(), status: 'published', divisions: ['8U'] },
+  { id: 'sched-summer', name: 'Summer 2025', createdAt: new Date().toISOString(), status: 'draft', divisions: ['11U'] },
+  { id: 'sched-fall', name: 'Fall 2025', createdAt: new Date().toISOString(), status: 'draft', divisions: ['13U'] },
+  { id: 'sched-tourney', name: 'Tournament 2025', createdAt: new Date().toISOString(), status: 'published', divisions: ['10U'] },
 ];
 
 export function getCreatedSchedules(): CreatedSchedule[] {
@@ -22,7 +23,16 @@ export function getCreatedSchedules(): CreatedSchedule[] {
     const raw = localStorage.getItem(SCHEDULES_KEY);
     if (!raw) return MOCK_SCHEDULES;
     const parsed = JSON.parse(raw) as CreatedSchedule[];
-    return parsed.length > 0 ? parsed : MOCK_SCHEDULES;
+    if (parsed.length === 0) return MOCK_SCHEDULES;
+    // Merge mock divisions into schedules missing them
+    const mockById = new Map(MOCK_SCHEDULES.map((s) => [s.id, s]));
+    return parsed.map((s) => {
+      const mock = mockById.get(s.id);
+      if (mock && (!s.divisions || s.divisions.length === 0)) {
+        return { ...s, divisions: mock.divisions };
+      }
+      return s;
+    });
   } catch {
     return MOCK_SCHEDULES;
   }
