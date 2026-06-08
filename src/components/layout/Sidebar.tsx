@@ -20,10 +20,23 @@ export function Sidebar({
   onToggle,
 }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set());
 
   const handleToggle = () => {
     setIsCollapsed(!isCollapsed);
     onToggle?.();
+  };
+
+  const toggleMenu = (href: string) => {
+    setExpandedMenus((prev) => {
+      const next = new Set(prev);
+      if (next.has(href)) {
+        next.delete(href);
+      } else {
+        next.add(href);
+      }
+      return next;
+    });
   };
 
   return (
@@ -70,17 +83,51 @@ export function Sidebar({
             {navItems.map((item) => (
               <li key={item.href} className="sui-relative sui-w-full">
                 {item.hasSubmenu ? (
-                  <button
-                    className={`sui-group sui-w-full sui-text-left hover:sui-bg-accent-background-weak focus:sui-bg-accent-background-weak sui-px-3 sui-py-2 sui-font-semibold sui-flex sui-items-center sui-gap-2 ${
-                      item.active
-                        ? "sui-bg-accent-background sui-text-white sui-fill-white"
-                        : "sui-text-neutral-text"
-                    }`}
-                  >
-                    <SimpleIcon name={item.icon} />
-                    {!isCollapsed && <span>{item.label}</span>}
-                    {!isCollapsed && <SimpleIcon name="expand_more" className="sui-ml-auto" />}
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => toggleMenu(item.href)}
+                      className={`sui-group sui-w-full sui-text-left hover:sui-bg-accent-background-weak focus:sui-bg-accent-background-weak sui-px-3 sui-py-2 sui-font-semibold sui-flex sui-items-center sui-gap-2 ${
+                        item.active
+                          ? "sui-bg-accent-background sui-text-white sui-fill-white"
+                          : "sui-text-neutral-text"
+                      }`}
+                    >
+                      <SimpleIcon name={item.icon} />
+                      {!isCollapsed && <span>{item.label}</span>}
+                      {!isCollapsed && (
+                        <SimpleIcon
+                          name="expand_more"
+                          className={`sui-ml-auto sui-transition-transform ${
+                            expandedMenus.has(item.href) ? "sui-rotate-180" : ""
+                          }`}
+                        />
+                      )}
+                    </button>
+                    {!isCollapsed && expandedMenus.has(item.href) && item.items && (
+                      <ul className="sui-grid sui-gap-0.5 sui-pl-4 sui-mt-0.5">
+                        {item.items.map((subItem) => (
+                          <li key={subItem.href}>
+                            <a
+                              href={subItem.href}
+                              className={`sui-group sui-block sui-px-3 sui-py-2 sui-text-sm sui-font-semibold ${
+                                subItem.active
+                                  ? "sui-bg-accent-background sui-text-white sui-fill-white hover:sui-bg-accent-background-hover focus:sui-bg-accent-background-hover"
+                                  : "sui-text-neutral-text hover:sui-bg-accent-background-weak focus:sui-bg-accent-background-weak"
+                              }`}
+                            >
+                              {subItem.icon && (
+                                <span className="sui-inline-flex sui-mr-2">
+                                  <SimpleIcon name={subItem.icon} size="s" />
+                                </span>
+                              )}
+                              {subItem.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
                 ) : (
                   <a
                     href={item.href}

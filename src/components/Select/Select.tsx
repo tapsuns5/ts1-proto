@@ -307,7 +307,7 @@ function SelectInner<IsMulti extends boolean = false>(
         }
         getOptionLabel={getOptionLabel}
         formatOptionLabel={internalFormatOptionLabel}
-        menuPortalTarget={menuPortalTarget ?? document.body}
+        menuPortalTarget={menuPortalTarget !== undefined ? menuPortalTarget : document.body}
         menuPlacement={menuPlacement}
         menuPosition={menuPosition}
         components={menuComponents}

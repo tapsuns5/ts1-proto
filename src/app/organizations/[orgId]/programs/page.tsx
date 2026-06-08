@@ -10,12 +10,22 @@ import { Card, CardHeader, CardFooter } from "@/components/Card/Card";
 import Badge from "@/components/Badge/Badge";
 import IconButton from "@/components/IconButton/IconButton";
 import Icon from "@/components/Icon/Icon";
+import { CreateProgramDialog } from "@/components/programs/CreateProgramDialog";
 
 const mockNavItems: NavItem[] = [
   { label: "Registrations", icon: "view_cozy", href: "/organizations/81656/registrations" },
   { label: "Programs", icon: "menu_book", href: "/organizations/81656/programs", active: true },
   { label: "Financials", icon: "payments", href: "/organizations/81656/financials" },
-  { label: "Communications", icon: "message", href: "/organizations/81656/communications", hasSubmenu: true },
+  {
+    label: "Communications",
+    icon: "message",
+    href: "/organizations/81656/communications",
+    hasSubmenu: true,
+    items: [
+      { label: "Team Chats", href: "/organizations/81656/messages/chat" },
+      { label: "Messages", href: "/organizations/81656/messages" },
+    ],
+  },
   { label: "Rostering", icon: "groups", href: "/organizations/81656/rostering" },
   { label: "Settings", icon: "settings", href: "/organizations/81656/settings" },
 ];
@@ -24,7 +34,20 @@ const mockBreadcrumbs: BreadcrumbItem[] = [
   { label: "Programs", href: "/organizations/81656/programs", active: true },
 ];
 
-const mockPrograms = [
+type Program = {
+  id: string;
+  name: string;
+  status: string;
+  startDate: Date;
+  endDate: Date;
+  totalParticipants: number;
+  players: number;
+  staff: number;
+  teams: number;
+  isRCX?: boolean;
+};
+
+const initialPrograms: Program[] = [
   {
     id: "85703",
     name: "FTL Optimist Baseball League Spring",
@@ -48,21 +71,28 @@ const mockPrograms = [
     teams: 0,
   },
   {
-    id: "88277",
-    name: "RCX",
-    status: "no-dates",
-    startDate: null,
-    endDate: null,
-    totalParticipants: 0,
-    players: 0,
-    staff: 0,
-    teams: 0,
+    id: "93873",
+    name: "FTL Flag Football - RCX",
+    status: "active",
+    startDate: new Date("2026-05-01"),
+    endDate: new Date("2026-05-31"),
+    totalParticipants: 1500,
+    players: 1000,
+    staff: 100,
+    teams: 50,
+    isRCX: true,
   },
 ];
 
 export default function ProgramsPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("active");
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [programs, setPrograms] = useState<Program[]>(initialPrograms);
+
+  const handleCreateProgram = (newProgram: Program) => {
+    setPrograms((prev) => [newProgram, ...prev]);
+  };
 
   const formatDateRange = (startDate: Date | null, endDate: Date | null) => {
     if (!startDate && !endDate) return "No dates";
@@ -71,18 +101,25 @@ export default function ProgramsPage() {
     return `${start} - ${end}`;
   };
 
-  const ProgramCard = ({ program }: { program: typeof mockPrograms[0] }) => {
+  const ProgramCard = ({ program }: { program: Program }) => {
     const isEmpty = program.totalParticipants === 0;
     
     return (
       <Card className="sui-rounded sui-shadow-2 sui-border sui-border-solid sui-border-transparent sui-bg-white sui-px-3 sui-py-2" data-testid={`program-card-${program.id}`}>
         <CardHeader className="sui-flex sui-justify-between sui-mb-0.5 sui-flex-row sui-items-start sui-space-y-0">
           <h2 className="sui-heading-sm sui-text-action-text hover:sui-underline">
-            <button 
+            <button
               onClick={() => router.push(`/organizations/81656/programs/${program.id}`)}
-              className="sui-text-action-text hover:sui-underline sui-bg-transparent sui-p-0 sui-cursor-pointer sui-align-middle sui-w-fit sui-border-b sui-border-solid sui-border-transparent sui-pb-px hover:sui-text-admin-action-text-hover hover:[border-color:currentColor] focus:sui-text-admin-action-text-pressed focus:[border-color:currentColor] active:sui-text-admin-action-text-pressed active:[border-color:currentColor] visited:sui-text-admin-action-text-pressed"
+              className="sui-text-action-text hover:sui-underline sui-bg-transparent sui-p-0 sui-cursor-pointer sui-align-middle sui-w-fit sui-border-b sui-border-solid sui-border-transparent sui-pb-px hover:sui-text-admin-action-text-hover hover:[border-color:currentColor] focus:sui-text-admin-action-text-pressed focus:[border-color:currentColor] active:sui-text-admin-action-text-pressed active:[border-color:currentColor] visited:sui-text-admin-action-text-pressed sui-flex sui-items-center sui-gap-1"
             >
               {program.name}
+              {program.isRCX && (
+                <img
+                  alt="RCX Sports"
+                  className="sui-h-2 sui-w-auto sui-pl-3"
+                  src="/RCXSports_Vert_CMYK.png"
+                />
+              )}
             </button>
           </h2>
           <div className="sui-flex sui-gap-1">
@@ -177,7 +214,7 @@ export default function ProgramsPage() {
     >
       <div className="sui-px-2 md:sui-px-3 lg:sui-px-4 sui-mx-auto sui-mb-4 sui-pt-4">
         <header className="sui-flex sui-justify-end sui-min-h-[48px]">
-          <LabelButton variantType="primary" icon="add" labelText="Create Program" />
+          <LabelButton variantType="primary" icon="add" labelText="Create Program" onClick={() => setCreateDialogOpen(true)} />
         </header>
         
         <Tabs
@@ -191,7 +228,7 @@ export default function ProgramsPage() {
       <section className="sui-pb-[100px]">
         <div className="sui-px-2 md:sui-px-3 lg:sui-px-4 sui-mx-auto sui-pb-12 sui-max-w-[1200px]" data-testid="programs-cards-container">
           <section className="sui-grid sui-gap-3 sui-mb-4">
-            {mockPrograms.map((program) => (
+            {programs.map((program) => (
               <ProgramCard key={program.id} program={program} />
             ))}
           </section>
@@ -216,6 +253,11 @@ export default function ProgramsPage() {
           </div>
         </div>
       </section>
+      <CreateProgramDialog
+        open={createDialogOpen}
+        onClose={() => setCreateDialogOpen(false)}
+        onCreate={handleCreateProgram}
+      />
     </OrgLayout>
   );
 }

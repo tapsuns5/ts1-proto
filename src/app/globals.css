@@ -1,6 +1,9 @@
 @import "../styles/_primitives-variables.css";
 @import "../styles/_theme-variables.css";
 @import "../styles/_deprecated-variables.css";
+@import "react-datepicker/dist/react-datepicker.css";
+@import "../components/Calendar/Calendar.css";
+@import "../components/DatePicker/DatePicker.css";
 
 @font-face {
   font-family: "Magno Sans";

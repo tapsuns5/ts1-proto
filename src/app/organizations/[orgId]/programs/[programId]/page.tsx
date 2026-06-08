@@ -6,12 +6,22 @@ import { NavItem, BreadcrumbItem } from "@/components/layout/types";
 import { ProgramHeader } from "@/components/programs/ProgramHeader";
 import { ProgramTabs } from "@/components/programs/ProgramTabs";
 import { ScheduleTab } from "@/components/programs/ScheduleTab";
+import { EditProgramDialog } from "@/components/programs/EditProgramDialog";
 
 const mockNavItems: NavItem[] = [
   { label: "Registrations", icon: "view_cozy", href: "/organizations/1/registrations" },
   { label: "Programs", icon: "menu_book", href: "/organizations/1/programs", active: true },
   { label: "Financials", icon: "payments", href: "/organizations/1/financials/transactions" },
-  { label: "Communications", icon: "message", href: "/organizations/1/communications", hasSubmenu: true },
+  {
+    label: "Communications",
+    icon: "message",
+    href: "/organizations/1/communications",
+    hasSubmenu: true,
+    items: [
+      { label: "Team Chats", href: "/organizations/1/messages/chat" },
+      { label: "Messages", href: "/organizations/1/messages" },
+    ],
+  },
   { label: "Rostering", icon: "groups", href: "/organizations/1/rostering" },
   { label: "Media", icon: "video_library", href: "/organizations/1/media" },
   { label: "Settings", icon: "settings", href: "/organizations/1/settings" },
@@ -89,8 +99,20 @@ const mockEvents = [
   },
 ];
 
+const mockProgram = {
+  programName: "FTL Optimist Baseball League Spring",
+  status: "active" as const,
+  startDate: "Jan 1, 2026",
+  endDate: "Dec 31, 2026",
+  sport: "Baseball",
+  type: "League",
+  activeDates: [new Date("2026-01-01"), new Date("2026-12-31")] as [Date, Date],
+  enableStandings: false,
+};
+
 export default function ProgramPage() {
   const [activeTab, setActiveTab] = useState("schedule");
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const tabs = [
     {
@@ -126,15 +148,26 @@ export default function ProgramPage() {
       onHelpClick={() => console.log("Help clicked")}
     >
       <ProgramHeader
-        programName="FTL Optimist Baseball League Spring"
-        status="active"
-        startDate="Jan 1, 2026"
-        endDate="Dec 31, 2026"
-        onEdit={() => console.log("Edit program")}
+        programName={mockProgram.programName}
+        status={mockProgram.status}
+        startDate={mockProgram.startDate}
+        endDate={mockProgram.endDate}
+        onEdit={() => setEditDialogOpen(true)}
         onArchive={() => console.log("Archive program")}
         onRostering={() => console.log("Go to rostering")}
       />
       <ProgramTabs tabs={tabs} defaultTab="schedule" />
+      <EditProgramDialog
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        initialData={{
+          programName: mockProgram.programName,
+          sport: mockProgram.sport,
+          type: mockProgram.type,
+          activeDates: mockProgram.activeDates,
+          enableStandings: mockProgram.enableStandings,
+        }}
+      />
     </OrgLayout>
   );
 }
