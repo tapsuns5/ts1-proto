@@ -18,7 +18,7 @@ export function Header({
   onHelpClick,
 }: HeaderProps) {
   return (
-    <div className="sui-gap-1 sui-shadow-1 sui-bg-neutral-background-weak sui-border-solid sui-border-b sui-border-neutral-border sui-sticky sui-top-[0px] sui-px-2 md:sui-px-3 lg:sui-px-4 sui-py-[8px] lg:sui-py-[12px] sui-items-center lg:sui-justify-space-between sui-flex">
+    <div className="sui-gap-1 sui-shadow-1 sui-bg-neutral-background-weak sui-border-solid sui-border-b sui-border-neutral-border sui-sticky sui-top-[0px] sui-z-50 sui-px-2 md:sui-px-3 lg:sui-px-4 sui-py-[8px] lg:sui-py-[12px] sui-items-center lg:sui-justify-space-between sui-flex">
       <div>
         <nav aria-label="breadcrumb" className="sui-px-1">
           <ol className="sui-gap-1.5 sui-text-sm sm:sui-gap-2.5 sui-flex sui-items-center sui-break-words">

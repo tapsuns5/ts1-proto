@@ -380,6 +380,59 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
   const [cardItems, setCardItems] = useState<ScheduleCardItem[]>([]);
   const [isClientLoaded, setIsClientLoaded] = useState(false);
   const [dataReportSheetOpen, setDataReportSheetOpen] = useState(false);
+  const [showUnscheduledGames, setShowUnscheduledGames] = useState(false);
+  const [isLoadingUnscheduled, setIsLoadingUnscheduled] = useState(false);
+  const [unscheduledEvents, setUnscheduledEvents] = useState<ScheduleEvent[]>([]);
+
+  // Generate unscheduled game events from existing teams
+  const generateUnscheduledEvents = (sourceEvents: ScheduleEvent[]): ScheduleEvent[] => {
+    const teamSet = new Set<string>();
+    sourceEvents.forEach((event) => {
+      if (event.type === "game" && event.team) {
+        event.team.split(" vs ").forEach((t) => teamSet.add(t.trim()));
+      }
+    });
+    const teams = Array.from(teamSet).sort();
+    if (teams.length < 2) return [];
+
+    const newEvents: ScheduleEvent[] = [];
+    let idCounter = 9000;
+    // Create round-robin style matchups, each pair plays once unscheduled
+    for (let i = 0; i < teams.length; i++) {
+      for (let j = i + 1; j < teams.length; j++) {
+        newEvents.push({
+          id: `unscheduled-${idCounter++}`,
+          date: "TBD",
+          time: "TBD",
+          timezone: "",
+          type: "game",
+          name: `${teams[i]} vs ${teams[j]}`,
+          team: `${teams[i]} vs ${teams[j]}`,
+          status: "draft",
+          venue: "TBD",
+          scheduleName: "Unscheduled",
+        });
+      }
+    }
+    return newEvents;
+  };
+
+  const handleToggleUnscheduled = (checked: boolean) => {
+    setIsLoadingUnscheduled(true);
+    setShowUnscheduledGames(checked);
+    if (checked) {
+      setTimeout(() => {
+        const generated = generateUnscheduledEvents(allEvents);
+        setUnscheduledEvents(generated);
+        setIsLoadingUnscheduled(false);
+      }, 800);
+    } else {
+      setTimeout(() => {
+        setUnscheduledEvents([]);
+        setIsLoadingUnscheduled(false);
+      }, 500);
+    }
+  };
 
   const loadCardItems = (overrideEvents?: ScheduleEvent[]) => {
     const drafts = getDrafts();
@@ -534,10 +587,14 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
     setCoachConflictDialogOpen(true);
   };
 
-  const displayEvents =
+  const baseEvents =
     selectedSchedules.length > 0
       ? allEvents.filter((e) => e.scheduleName && selectedSchedules.includes(e.scheduleName))
       : allEvents;
+
+  const displayEvents = showUnscheduledGames
+    ? unscheduledEvents
+    : baseEvents;
 
   const coachConflictCount = displayEvents.filter((e) => e.coachConflicts && e.coachConflicts.length > 0).length;
   const venueConflictCount = displayEvents.filter((e) => e.hasConflict).length;
@@ -603,19 +660,41 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
           {/* Filters Section */}
           <div className="sui-flex sui-flex-col sui-gap-2 sui-flex-wrap sm:sui-flex-row">
             {/* Date Range Selector */}
-            <fieldset className="sui-w-full sm:sui-w-fit">
-              <button className="sui-flex sui-w-full sui-items-center sui-justify-between sui-gap-1 sui-rounded-full sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-px-2 sui-text-desktop-5 hover:sui-border-action-border-hover sui-h-[32px] sui-cursor-pointer">
-                <span className="sui-flex sui-flex-row sui-gap-1 sui-items-center">
-                  <SimpleIcon name="calendar_today" size="s" className="sui-text-neutral-icon-medium" />
-                  <span className="sui-flex sui-flex-row sui-gap-1 sui-items-center sui-justify-center sui-p-[4px_8px] sui-rounded-[10px]">
-                    01/01/2024
-                  </span>{" "}
-                  -{" "}
-                  <span className="sui-flex sui-flex-row sui-gap-1 sui-items-center sui-justify-center sui-p-[4px_8px] sui-rounded-[10px]">
-                    01/01/2026
+            <div
+              className="sui-overflow-hidden sui-transition-all sui-duration-300 sui-ease-in-out"
+              style={{
+                maxWidth: showUnscheduledGames ? 0 : 280,
+                opacity: showUnscheduledGames ? 0 : 1,
+              }}
+            >
+              <fieldset className="sui-w-full sm:sui-w-fit">
+                <button className="sui-flex sui-w-full sui-items-center sui-justify-between sui-gap-1 sui-rounded-full sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-px-2 sui-text-desktop-5 hover:sui-border-action-border-hover sui-h-[32px] sui-cursor-pointer">
+                  <span className="sui-flex sui-flex-row sui-gap-1 sui-items-center">
+                    <SimpleIcon name="calendar_today" size="s" className="sui-text-neutral-icon-medium" />
+                    <span className="sui-flex sui-flex-row sui-gap-1 sui-items-center sui-justify-center sui-p-[4px_8px] sui-rounded-[10px]">
+                      01/01/2024
+                    </span>{" "}
+                    -{" "}
+                    <span className="sui-flex sui-flex-row sui-gap-1 sui-items-center sui-justify-center sui-p-[4px_8px] sui-rounded-[10px]">
+                      01/01/2026
+                    </span>
                   </span>
-                </span>
-              </button>
+                </button>
+              </fieldset>
+            </div>
+
+            {/* Show Unscheduled Games Toggle */}
+            <fieldset className="sui-flex sui-items-center sui-gap-1">
+              <input
+                id="showUnscheduledGames"
+                type="checkbox"
+                checked={showUnscheduledGames}
+                onChange={(e) => handleToggleUnscheduled(e.target.checked)}
+                className="sui-w-3 sui-h-3"
+              />
+              <label htmlFor="showUnscheduledGames" className="sui-whitespace-nowrap sui-text-xs sui-font-medium sui-text-neutral-text-medium sui-cursor-pointer">
+                Show Unscheduled Games
+              </label>
             </fieldset>
             
             {/* Filter Buttons */}
@@ -644,7 +723,6 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
                 <div className="sui-flex sui-items-center sui-gap-[4px] !sui-font-semibold sui-text-label">
                   <SimpleIcon name="add" size="s" />
                   <span className="hidden sm:inline">Division/Teams</span>
-                  <span className="sm:hidden">Teams</span>
                 </div>
               </button>
               <button className="sui-flex sui-cursor-pointer sui-items-center sui-rounded-full sui-border sui-border-dashed sui-border-neutral-border-medium hover:sui-border-admin-action-border sui-px-2 sui-py-[2px] sui-pl-1 sui-min-h-[32px] sui-gap-1 sui-whitespace-nowrap sui-min-w-[80px]">
@@ -657,14 +735,12 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
                 <div className="sui-flex sui-items-center sui-gap-[4px] !sui-font-semibold sui-text-label">
                   <SimpleIcon name="add" size="s" />
                   <span className="hidden sm:inline">Event Type</span>
-                  <span className="sm:hidden">Type</span>
                 </div>
               </button>
               <button className="sui-flex sui-cursor-pointer sui-items-center sui-rounded-full sui-border sui-border-dashed sui-border-neutral-border-medium hover:sui-border-admin-action-border sui-px-2 sui-py-[2px] sui-pl-1 sui-min-h-[32px] sui-gap-1 sui-whitespace-nowrap sui-min-w-[80px]">
                 <div className="sui-flex sui-items-center sui-gap-[4px] !sui-font-semibold sui-text-label">
                   <SimpleIcon name="add" size="s" />
                   <span className="hidden sm:inline">Event Status</span>
-                  <span className="sm:hidden">Status</span>
                 </div>
               </button>
               <SimpleLabelButton type="tertiary" size="small" label="Clear all" onClick={() => { setSelectedSchedules([]); }} />
@@ -821,7 +897,20 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
             )}
           </header>
 
-          <div className="sui-overflow-x-auto sui-border-l sui-border-r sui-border-b sui-border-neutral-border sui-bg-white sui-rounded-b-lg">
+          <div className="sui-relative sui-overflow-x-auto sui-border-l sui-border-r sui-border-b sui-border-neutral-border sui-bg-white sui-rounded-b-lg">
+            {/* Loading overlay */}
+            {isLoadingUnscheduled && (
+              <div className="sui-absolute sui-inset-0 sui-z-20 sui-flex sui-flex-col sui-items-center sui-justify-center sui-bg-white/90">
+                <div className="sui-flex sui-items-center sui-gap-1.5">
+                  <div className="sui-w-2.5 sui-h-2.5 sui-bg-[#2d5a87] sui-rounded-full sui-animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <div className="sui-w-2.5 sui-h-2.5 sui-bg-[#2d5a87] sui-rounded-full sui-animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <div className="sui-w-2.5 sui-h-2.5 sui-bg-[#2d5a87] sui-rounded-full sui-animate-bounce" style={{ animationDelay: "300ms" }} />
+                </div>
+                <span className="sui-mt-3 sui-text-xs sui-text-neutral-text-medium sui-font-medium">
+                  {showUnscheduledGames ? "Loading unscheduled games..." : "Loading scheduled games..."}
+                </span>
+              </div>
+            )}
             <table className="sui-w-full sui-border-spacing-0 sui-border-separate sui-text-body-dense sui-min-w-[600px] sm:sui-min-w-[700px]" data-testid="schedule-table">
             <thead className="[&_th]:sui-border-b [&_th]:sui-border-solid [&_th]:sui-border-neutral-border [&_th]:sui-bg-neutral-background-weak">
               <tr className="sui-group/row [&_td]:sui-border-b [&_td]:sui-border-solid [&_td]:sui-border-neutral-border hover:sui-bg-neutral-background-weak data-[state=selected]:sui-bg-admin-action-background-weak-hover data-[state=selected]:hover:sui-bg-admin-action-background-weak-hover">
@@ -887,8 +976,8 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
               {Object.entries(groupedEvents).map(([date, dateEvents]) => (
                 <Fragment key={date}>
                   <tr className="sui-group/row [&_td]:sui-border-b [&_td]:sui-border-solid [&_td]:sui-border-neutral-border hover:sui-bg-neutral-background-weak data-[state=selected]:sui-bg-admin-action-background-weak-hover data-[state=selected]:hover:sui-bg-admin-action-background-weak-hover">
-                    <td className="sui-align-middle [&:has([role=checkbox])]:sui-pr-0 sui-font-bold sui-text-neutral-primary sui-bg-white sui-sticky sui-p-0 sui-z-10 sui-top-[73px]" colSpan={7}>
-                      <div className="sui-p-2 sui-flex sui-gap-2 sui-items-center">
+                    <td className="sui-align-middle [&:has([role=checkbox])]:sui-pr-0 sui-font-bold sui-text-neutral-primary sui-bg-white sui-sticky sui-p-0 sui-z-10 sui-top-[57px]" colSpan={7}>
+                      <div className="sui-py-1 sui-px-2 sui-flex sui-gap-2 sui-items-center">
                         <SimpleCheckbox
                           checked={selectedDate.has(date)}
                           onChange={(checked) => toggleDateSelection(date, dateEvents)}
@@ -921,7 +1010,7 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
                       <td className={`sui-p-2 [&:has([role=checkbox])]:sui-pr-0 sui-w-[120px] sm:sui-w-[20%] sui-align-top sui-pl-0 ${event.status === "canceled" ? "sui-line-through" : ""}`}>
                         <div className="sui-flex sui-flex-col sui-gap-1">
                           <p className="sui-text-neutral-text-medium sui-text-xs sm:text-sm sui-font-medium">
-                            {event.time}
+                            {event.time || "TBD"}
                           </p>
                           <p className="sui-text-neutral-text-medium sui-text-xs sm:text-xs">
                             {event.timezone}
