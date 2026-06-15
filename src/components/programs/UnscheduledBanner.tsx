@@ -23,7 +23,7 @@ export function UnscheduledBanner({
     : "View unscheduled";
 
   return (
-    <div className="sui-flex sui-items-center sui-justify-between sui-px-3 sui-py-2.5 sui-bg-[#dbeafe] sui-border sui-border-solid sui-border-[#bfdbfe] sui-rounded-lg sui-mb-3">
+    <div className="sui-flex sui-items-center sui-justify-between sui-px-3 sui-py-2 sui-bg-[#dbeafe] sui-border sui-border-solid sui-border-[#bfdbfe] sui-rounded-lg sui-mb-3">
       <div className="sui-flex sui-items-center sui-gap-2 sui-text-sm sui-text-[#1447e6] sui-min-w-0">
         <SimpleIcon name="event_busy" size="s" className="sui-flex-shrink-0" />
         <span className="sui-truncate">{message}</span>

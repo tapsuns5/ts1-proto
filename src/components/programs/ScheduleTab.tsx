@@ -706,25 +706,31 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
                   <span className="hidden sm:inline">Division/Teams</span>
                 </div>
               </button>
-              <button className="sui-flex sui-cursor-pointer sui-items-center sui-rounded-full sui-border sui-border-dashed sui-border-neutral-border-medium hover:sui-border-admin-action-border sui-px-2 sui-py-[2px] sui-pl-1 sui-min-h-[32px] sui-gap-1 sui-whitespace-nowrap sui-min-w-[80px]">
-                <div className="sui-flex sui-items-center sui-gap-[4px] !sui-font-semibold sui-text-label">
-                  <SimpleIcon name="add" size="s" />
-                  Venues
-                </div>
-              </button>
-              <button className="sui-flex sui-cursor-pointer sui-items-center sui-rounded-full sui-border sui-border-dashed sui-border-neutral-border-medium hover:sui-border-admin-action-border sui-px-2 sui-py-[2px] sui-pl-1 sui-min-h-[32px] sui-gap-1 sui-whitespace-nowrap sui-min-w-[80px]">
-                <div className="sui-flex sui-items-center sui-gap-[4px] !sui-font-semibold sui-text-label">
-                  <SimpleIcon name="add" size="s" />
-                  <span className="hidden sm:inline">Event Type</span>
-                </div>
-              </button>
-              <button className="sui-flex sui-cursor-pointer sui-items-center sui-rounded-full sui-border sui-border-dashed sui-border-neutral-border-medium hover:sui-border-admin-action-border sui-px-2 sui-py-[2px] sui-pl-1 sui-min-h-[32px] sui-gap-1 sui-whitespace-nowrap sui-min-w-[80px]">
-                <div className="sui-flex sui-items-center sui-gap-[4px] !sui-font-semibold sui-text-label">
-                  <SimpleIcon name="add" size="s" />
-                  <span className="hidden sm:inline">Event Status</span>
-                </div>
-              </button>
-              <SimpleLabelButton type="tertiary" size="small" label="Clear all" onClick={() => { setSelectedSchedules([]); }} />
+              {!showUnscheduledGames && (
+                <>
+                  <button className="sui-flex sui-cursor-pointer sui-items-center sui-rounded-full sui-border sui-border-dashed sui-border-neutral-border-medium hover:sui-border-admin-action-border sui-px-2 sui-py-[2px] sui-pl-1 sui-min-h-[32px] sui-gap-1 sui-whitespace-nowrap sui-min-w-[80px]">
+                    <div className="sui-flex sui-items-center sui-gap-[4px] !sui-font-semibold sui-text-label">
+                      <SimpleIcon name="add" size="s" />
+                      Venues
+                    </div>
+                  </button>
+                  <button className="sui-flex sui-cursor-pointer sui-items-center sui-rounded-full sui-border sui-border-dashed sui-border-neutral-border-medium hover:sui-border-admin-action-border sui-px-2 sui-py-[2px] sui-pl-1 sui-min-h-[32px] sui-gap-1 sui-whitespace-nowrap sui-min-w-[80px]">
+                    <div className="sui-flex sui-items-center sui-gap-[4px] !sui-font-semibold sui-text-label">
+                      <SimpleIcon name="add" size="s" />
+                      <span className="hidden sm:inline">Event Type</span>
+                    </div>
+                  </button>
+                  <button className="sui-flex sui-cursor-pointer sui-items-center sui-rounded-full sui-border sui-border-dashed sui-border-neutral-border-medium hover:sui-border-admin-action-border sui-px-2 sui-py-[2px] sui-pl-1 sui-min-h-[32px] sui-gap-1 sui-whitespace-nowrap sui-min-w-[80px]">
+                    <div className="sui-flex sui-items-center sui-gap-[4px] !sui-font-semibold sui-text-label">
+                      <SimpleIcon name="add" size="s" />
+                      <span className="hidden sm:inline">Event Status</span>
+                    </div>
+                  </button>
+                </>
+              )}
+              {selectedSchedules.length > 0 && (
+                <SimpleLabelButton type="tertiary" size="small" label="Clear all" onClick={() => { setSelectedSchedules([]); }} />
+              )}
             </div>
           </div>
           
