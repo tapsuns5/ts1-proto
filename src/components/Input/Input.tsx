@@ -67,10 +67,11 @@ const Input = React.forwardRef<
     const sizeClass = `input__field--${size}`;
     const showClear = allowClear && value && ["text", "email"].includes(type);
     // Bypasses React's value setter to preserve trailing zeros on type="number" inputs
-    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      "value",
-    )?.set;
+    const getNativeInputValueSetter = () =>
+      typeof HTMLInputElement !== "undefined"
+        ? Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")
+            ?.set
+        : undefined;
     // Treats decimalLimit={0} the same as allowDecimals={false}
     const effectiveAllowDecimals = allowDecimals && decimalLimit !== 0;
     // Derives the HTML step attribute from decimalLimit (e.g. decimalLimit=2 → "0.01")
@@ -174,7 +175,7 @@ const Input = React.forwardRef<
                           decimalLimit,
                         );
                         if (sanitized !== target.value) {
-                          nativeInputValueSetter?.call(target, sanitized);
+                          getNativeInputValueSetter()?.call(target, sanitized);
                         }
                       },
                     })}

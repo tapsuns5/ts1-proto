@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Fragment, useEffect } from "react";
+import { useState, Fragment, useEffect, useMemo } from "react";
 import { SimpleIcon } from "../SimpleIcon";
 import { SimpleLabelButton } from "../SimpleLabelButton";
 import { SimpleCheckbox } from "../SimpleCheckbox";
@@ -29,6 +29,8 @@ import BulkEditDialog from "./BulkEditDialog";
 import ScheduleWizard from "../schedule-wizard/ScheduleWizard";
 import { DraftGamesReadyModal } from "../schedule-wizard/DraftGamesReadyModal";
 import { ScheduleCards, type ScheduleCardItem } from "./ScheduleCards";
+import { UnscheduledBanner } from "./UnscheduledBanner";
+import { UnscheduledTable } from "./UnscheduledTable";
 import { Sheet, SheetContent, SheetHeader, SheetBody, SheetFooter, SheetTitle } from "../Sheet/Sheet";
 import { DataReport } from "./DataReport";
 import { getCreatedEvents, getCreatedSchedules, updateScheduleStatus } from "../schedule-wizard/utils/scheduleStorage";
@@ -381,8 +383,6 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
   const [isClientLoaded, setIsClientLoaded] = useState(false);
   const [dataReportSheetOpen, setDataReportSheetOpen] = useState(false);
   const [showUnscheduledGames, setShowUnscheduledGames] = useState(false);
-  const [isLoadingUnscheduled, setIsLoadingUnscheduled] = useState(false);
-  const [unscheduledEvents, setUnscheduledEvents] = useState<ScheduleEvent[]>([]);
 
   // Generate unscheduled game events from existing teams
   const generateUnscheduledEvents = (sourceEvents: ScheduleEvent[]): ScheduleEvent[] => {
@@ -417,22 +417,17 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
     return newEvents;
   };
 
-  const handleToggleUnscheduled = (checked: boolean) => {
-    setIsLoadingUnscheduled(true);
-    setShowUnscheduledGames(checked);
-    if (checked) {
-      setTimeout(() => {
-        const generated = generateUnscheduledEvents(allEvents);
-        setUnscheduledEvents(generated);
-        setIsLoadingUnscheduled(false);
-      }, 800);
-    } else {
-      setTimeout(() => {
-        setUnscheduledEvents([]);
-        setIsLoadingUnscheduled(false);
-      }, 500);
-    }
+  const handleToggleUnscheduled = () => {
+    setShowUnscheduledGames((prev) => !prev);
   };
+
+  const potentialUnscheduledEvents = useMemo(() => {
+    const source =
+      selectedSchedules.length > 0
+        ? allEvents.filter((e) => e.scheduleName && selectedSchedules.includes(e.scheduleName))
+        : allEvents;
+    return generateUnscheduledEvents(source);
+  }, [allEvents, selectedSchedules]);
 
   const loadCardItems = (overrideEvents?: ScheduleEvent[]) => {
     const drafts = getDrafts();
@@ -593,7 +588,7 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
       : allEvents;
 
   const displayEvents = showUnscheduledGames
-    ? unscheduledEvents
+    ? potentialUnscheduledEvents
     : baseEvents;
 
   const coachConflictCount = displayEvents.filter((e) => e.coachConflicts && e.coachConflicts.length > 0).length;
@@ -683,20 +678,6 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
               </fieldset>
             </div>
 
-            {/* Show Unscheduled Games Toggle */}
-            <fieldset className="sui-flex sui-items-center sui-gap-1">
-              <input
-                id="showUnscheduledGames"
-                type="checkbox"
-                checked={showUnscheduledGames}
-                onChange={(e) => handleToggleUnscheduled(e.target.checked)}
-                className="sui-w-3 sui-h-3"
-              />
-              <label htmlFor="showUnscheduledGames" className="sui-whitespace-nowrap sui-text-xs sui-font-medium sui-text-neutral-text-medium sui-cursor-pointer">
-                Show Unscheduled Games
-              </label>
-            </fieldset>
-            
             {/* Filter Buttons */}
             <div className="sui-flex sui-flex-wrap sui-gap-1">
               {isClientLoaded && (
@@ -803,6 +784,12 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
           </div>
         )}
 
+        <UnscheduledBanner
+          count={potentialUnscheduledEvents.length}
+          isShowingUnscheduled={showUnscheduledGames}
+          onToggle={handleToggleUnscheduled}
+        />
+
         <div className="sui-mb-4">
           <header className="sui-flex sui-border sui-border-neutral-border sui-items-center sui-flex-col md:sui-flex-row sui-pl-0 md:sui-pl-[20px] sui-rounded-t-lg sui-bg-white sui-gap-2">
             {selectedEvents.size > 0 && (
@@ -898,19 +885,28 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
           </header>
 
           <div className="sui-relative sui-overflow-x-auto sui-border-l sui-border-r sui-border-b sui-border-neutral-border sui-bg-white sui-rounded-b-lg">
-            {/* Loading overlay */}
-            {isLoadingUnscheduled && (
-              <div className="sui-absolute sui-inset-0 sui-z-20 sui-flex sui-flex-col sui-items-center sui-justify-center sui-bg-white/90">
-                <div className="sui-flex sui-items-center sui-gap-1.5">
-                  <div className="sui-w-2.5 sui-h-2.5 sui-bg-[#2d5a87] sui-rounded-full sui-animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <div className="sui-w-2.5 sui-h-2.5 sui-bg-[#2d5a87] sui-rounded-full sui-animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <div className="sui-w-2.5 sui-h-2.5 sui-bg-[#2d5a87] sui-rounded-full sui-animate-bounce" style={{ animationDelay: "300ms" }} />
-                </div>
-                <span className="sui-mt-3 sui-text-xs sui-text-neutral-text-medium sui-font-medium">
-                  {showUnscheduledGames ? "Loading unscheduled games..." : "Loading scheduled games..."}
-                </span>
-              </div>
-            )}
+            {showUnscheduledGames ? (
+              <UnscheduledTable
+                events={potentialUnscheduledEvents}
+                selectedEvents={selectedEvents}
+                onToggleSelection={(eventId) => {
+                  const newSelected = new Set(selectedEvents);
+                  if (newSelected.has(eventId)) {
+                    newSelected.delete(eventId);
+                  } else {
+                    newSelected.add(eventId);
+                  }
+                  setSelectedEvents(newSelected);
+                }}
+                onToggleSelectAll={(checked) => {
+                  if (checked) {
+                    setSelectedEvents(new Set(potentialUnscheduledEvents.map((e) => e.id)));
+                  } else {
+                    setSelectedEvents(new Set());
+                  }
+                }}
+              />
+            ) : (
             <table className="sui-w-full sui-border-spacing-0 sui-border-separate sui-text-body-dense sui-min-w-[600px] sm:sui-min-w-[700px]" data-testid="schedule-table">
             <thead className="[&_th]:sui-border-b [&_th]:sui-border-solid [&_th]:sui-border-neutral-border [&_th]:sui-bg-neutral-background-weak">
               <tr className="sui-group/row [&_td]:sui-border-b [&_td]:sui-border-solid [&_td]:sui-border-neutral-border hover:sui-bg-neutral-background-weak data-[state=selected]:sui-bg-admin-action-background-weak-hover data-[state=selected]:hover:sui-bg-admin-action-background-weak-hover">
@@ -1116,6 +1112,7 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
               ))}
             </tbody>
           </table>
+            )}
           </div>
         </div>
       </div>

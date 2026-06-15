@@ -11,6 +11,7 @@ import { EditProgramDialog } from "@/components/programs/EditProgramDialog";
 const mockNavItems: NavItem[] = [
   { label: "Registrations", icon: "view_cozy", href: "/organizations/1/registrations" },
   { label: "Programs", icon: "menu_book", href: "/organizations/1/programs", active: true },
+  { label: "Schedule", icon: "calendar_month", href: "/organizations/1/programs/85703/schedule" },
   { label: "Financials", icon: "payments", href: "/organizations/1/financials/transactions" },
   {
     label: "Communications",

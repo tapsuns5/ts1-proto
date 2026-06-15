@@ -15,6 +15,7 @@ import { CreateProgramDialog } from "@/components/programs/CreateProgramDialog";
 const mockNavItems: NavItem[] = [
   { label: "Registrations", icon: "view_cozy", href: "/organizations/81656/registrations" },
   { label: "Programs", icon: "menu_book", href: "/organizations/81656/programs", active: true },
+  { label: "Schedule", icon: "calendar_month", href: "/organizations/81656/programs/85703/schedule" },
   { label: "Financials", icon: "payments", href: "/organizations/81656/financials" },
   {
     label: "Communications",
@@ -212,7 +213,7 @@ export default function ProgramsPage() {
       userInitials="TP"
       onHelpClick={() => console.log("Help clicked")}
     >
-      <div className="sui-px-2 md:sui-px-3 lg:sui-px-4 sui-mx-auto sui-mb-4 sui-pt-4">
+      <div className="sui-px-2 md:sui-px-2 lg:sui-px-2 sui-mx-auto sui-mb-4 sui-pt-4">
         <header className="sui-flex sui-justify-end sui-min-h-[48px]">
           <LabelButton variantType="primary" icon="add" labelText="Create Program" onClick={() => setCreateDialogOpen(true)} />
         </header>
