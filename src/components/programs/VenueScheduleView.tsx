@@ -124,61 +124,63 @@ export function VenueScheduleView({
      
 
       {/* Filters + Actions row */}
-      <div className="sui-flex sui-flex-wrap sui-items-center sui-gap-2">
-        <Combobox
-          values={selectedPrograms}
-          onValuesChange={(vals) => setSelectedPrograms(vals)}
-        >
-          <ComboboxTrigger label="All Programs" />
-          <ComboboxContent headerTitle="Select programs">
-            <ComboboxList showSelectAllOption>
-              <ComboboxItem value="Clover Hill Baseball" label="Clover Hill Baseball" keywords={["Clover Hill Baseball"]} />
-            </ComboboxList>
-          </ComboboxContent>
-        </Combobox>
+      <div className="sui-flex sui-flex-wrap sui-items-center sui-justify-between sui-gap-2">
+        <div className="sui-flex sui-flex-wrap sui-items-center sui-gap-2">
+          <Combobox
+            values={selectedPrograms}
+            onValuesChange={(vals) => setSelectedPrograms(vals)}
+          >
+            <ComboboxTrigger label="All Programs" />
+            <ComboboxContent headerTitle="Select programs">
+              <ComboboxList showSelectAllOption>
+                <ComboboxItem value="Clover Hill Baseball" label="Clover Hill Baseball" keywords={["Clover Hill Baseball"]} />
+              </ComboboxList>
+            </ComboboxContent>
+          </Combobox>
 
-        <Combobox
-          values={selectedDivisions}
-          onValuesChange={(vals) => setSelectedDivisions(vals)}
-        >
-          <ComboboxTrigger label="All Divisions / Teams" />
-          <ComboboxContent headerTitle="Select divisions / teams">
-            <ComboboxList showSelectAllOption>
-              <ComboboxItem value="10U" label="10U" keywords={["10U"]} />
-              <ComboboxItem value="12U" label="12U" keywords={["12U"]} />
-              <ComboboxItem value="14U" label="14U" keywords={["14U"]} />
-              <ComboboxItem value="8U" label="8U" keywords={["8U"]} />
-            </ComboboxList>
-          </ComboboxContent>
-        </Combobox>
+          <Combobox
+            values={selectedDivisions}
+            onValuesChange={(vals) => setSelectedDivisions(vals)}
+          >
+            <ComboboxTrigger label="All Divisions / Teams" />
+            <ComboboxContent headerTitle="Select divisions / teams">
+              <ComboboxList showSelectAllOption>
+                <ComboboxItem value="10U" label="10U" keywords={["10U"]} />
+                <ComboboxItem value="12U" label="12U" keywords={["12U"]} />
+                <ComboboxItem value="14U" label="14U" keywords={["14U"]} />
+                <ComboboxItem value="8U" label="8U" keywords={["8U"]} />
+              </ComboboxList>
+            </ComboboxContent>
+          </Combobox>
 
-        <Combobox
-          values={selectedVenues}
-          onValuesChange={(vals) => setSelectedVenues(vals)}
-        >
-          <ComboboxTrigger label="All Venues" />
-          <ComboboxContent headerTitle="Select venues">
-            <ComboboxList showSelectAllOption>
-              {venueGroups.map((g) => (
-                <ComboboxItem key={g.name} value={g.name} label={g.name} keywords={[g.name]} />
-              ))}
-            </ComboboxList>
-          </ComboboxContent>
-        </Combobox>
+          <Combobox
+            values={selectedVenues}
+            onValuesChange={(vals) => setSelectedVenues(vals)}
+          >
+            <ComboboxTrigger label="All Venues" />
+            <ComboboxContent headerTitle="Select venues">
+              <ComboboxList showSelectAllOption>
+                {venueGroups.map((g) => (
+                  <ComboboxItem key={g.name} value={g.name} label={g.name} keywords={[g.name]} />
+                ))}
+              </ComboboxList>
+            </ComboboxContent>
+          </Combobox>
 
-        <Combobox
-          values={selectedEventTypes}
-          onValuesChange={(vals) => setSelectedEventTypes(vals)}
-        >
-          <ComboboxTrigger label="All Event Types" />
-          <ComboboxContent headerTitle="Select event types">
-            <ComboboxList showSelectAllOption>
-              <ComboboxItem value="game" label="Game" keywords={["Game"]} />
-              <ComboboxItem value="practice" label="Practice" keywords={["Practice"]} />
-              <ComboboxItem value="other" label="Other event" keywords={["Other event"]} />
-            </ComboboxList>
-          </ComboboxContent>
-        </Combobox>
+          <Combobox
+            values={selectedEventTypes}
+            onValuesChange={(vals) => setSelectedEventTypes(vals)}
+          >
+            <ComboboxTrigger label="All Event Types" />
+            <ComboboxContent headerTitle="Select event types">
+              <ComboboxList showSelectAllOption>
+                <ComboboxItem value="game" label="Game" keywords={["Game"]} />
+                <ComboboxItem value="practice" label="Practice" keywords={["Practice"]} />
+                <ComboboxItem value="other" label="Other event" keywords={["Other event"]} />
+              </ComboboxList>
+            </ComboboxContent>
+          </Combobox>
+        </div>
 
         <div className="sui-flex sui-items-center sui-gap-2">
           <SimpleLabelButton
