@@ -216,11 +216,13 @@ function DroppableDayCell({
   children,
   onClick,
   isOutside = false,
+  className,
 }: {
   date: Date;
   children: React.ReactNode;
   onClick: () => void;
   isOutside?: boolean;
+  className?: string;
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: date.toISOString(),
@@ -230,10 +232,11 @@ function DroppableDayCell({
     <div
       ref={setNodeRef}
       onClick={onClick}
-      className={`sui-relative sui-min-h-[120px] sui-p-1 sui-transition-colors sui-cursor-pointer sui-border-r sui-border-neutral-border last:sui-border-r-0
+      className={`sui-relative sui-p-0.5 sui-transition-colors sui-cursor-pointer sui-border-r sui-border-neutral-border last:sui-border-r-0
         ${isOutside ? "sui-bg-neutral-background-medium/50 sui-text-neutral-text-disabled" : "sui-bg-white sui-text-neutral-text"}
         ${isToday(date) ? "sui-bg-accent-background-weak/30" : ""}
         ${isOver ? "sui-bg-accent-background-weak/60" : ""}
+        ${className || ""}
       `}
     >
       {children}
@@ -288,7 +291,7 @@ function MonthView({
     <div className="sui-flex sui-flex-col sui-flex-1">
       <div className="sui-grid sui-grid-cols-7 sui-border-b sui-border-neutral-border">
         {weekdays.map((d) => (
-          <div key={d} className="sui-py-2 sui-text-center sui-text-sm sui-font-semibold sui-text-neutral-text-medium">
+          <div key={d} className="sui-py-1 sui-text-center sui-text-xs sui-font-semibold sui-text-neutral-text-medium">
             {d}
           </div>
         ))}
@@ -305,11 +308,12 @@ function MonthView({
                   date={day}
                   isOutside={isOutside}
                   onClick={() => onEventCreate(day)}
+                  className="sui-min-h-[90px]"
                 >
-                  <div className="sui-flex sui-justify-between sui-items-start sui-mb-2">
+                  <div className="sui-flex sui-justify-between sui-items-start sui-mb-1">
                     <span
                       className={`sui-text-xs sui-font-medium sui-leading-none
-                        ${isToday(day) ? "sui-bg-accent-background sui-text-white sui-w-6 sui-h-6 sui-flex sui-items-center sui-justify-center sui-rounded-full" : ""}
+                        ${isToday(day) ? "sui-bg-accent-background sui-text-white sui-w-3 sui-h-3 sui-flex sui-items-center sui-justify-center sui-rounded-full" : ""}
                       `}
                     >
                       {format(day, "d")}
@@ -367,16 +371,16 @@ function WeekView({
   return (
     <div className="sui-flex sui-flex-col sui-flex-1 sui-overflow-auto">
       <div className="sui-grid sui-grid-cols-8 sui-border-b sui-border-neutral-border sui-min-w-[800px]">
-        <div className="sui-py-2 sui-text-center sui-text-sm sui-font-semibold sui-text-neutral-text-medium sui-border-r sui-border-neutral-border" />
+        <div className="sui-py-1 sui-text-center sui-text-xs sui-font-semibold sui-text-neutral-text-medium sui-border-r sui-border-neutral-border" />
         {days.map((d) => (
           <div
             key={d.toISOString()}
-            className={`sui-py-2 sui-text-center sui-text-sm sui-font-semibold sui-border-r sui-border-neutral-border last:sui-border-r-0
+            className={`sui-py-1 sui-text-center sui-text-xs sui-font-semibold sui-border-r sui-border-neutral-border last:sui-border-r-0
               ${isToday(d) ? "sui-text-accent-background" : "sui-text-neutral-text-medium"}
             `}
           >
             <div>{format(d, "EEE")}</div>
-            <div className={`sui-text-lg sui-mt-0.5 ${isToday(d) ? "sui-bg-accent-background sui-text-white sui-w-8 sui-h-8 sui-rounded-full sui-flex sui-items-center sui-justify-center sui-mx-auto" : ""}`}>
+            <div className={`sui-text-sm sui-mt-0.5 ${isToday(d) ? "sui-bg-accent-background sui-text-white sui-w-3 sui-h-3 sui-rounded-full sui-flex sui-items-center sui-justify-center sui-mx-auto" : ""}`}>
               {format(d, "d")}
             </div>
           </div>
@@ -395,6 +399,7 @@ function WeekView({
                   key={`${day.toISOString()}-${hour}`}
                   date={setHours(day, hour)}
                   onClick={() => onEventCreate(setHours(day, hour))}
+                  className="sui-min-h-[48px]"
                 >
                   <div className="sui-grid sui-gap-0.5">
                     {hourEvents.map((event) => (
@@ -439,7 +444,7 @@ function DayView({
 
   return (
     <div className="sui-flex sui-flex-col sui-flex-1 sui-overflow-auto">
-      <div className="sui-py-3 sui-text-center sui-text-lg sui-font-semibold sui-border-b sui-border-neutral-border">
+      <div className="sui-py-2 sui-text-center sui-text-base sui-font-semibold sui-border-b sui-border-neutral-border">
         {format(currentDate, "EEEE, MMMM d, yyyy")}
       </div>
       <div className="sui-flex-1">
@@ -447,12 +452,13 @@ function DayView({
           const hourEvents = getEventsForHour(hour);
           return (
             <div key={hour} className="sui-grid sui-grid-cols-[80px_1fr] sui-border-b sui-border-neutral-border last:sui-border-b-0">
-              <div className="sui-py-2 sui-px-3 sui-text-xs sui-text-neutral-text-medium sui-border-r sui-border-neutral-border sui-text-right">
+              <div className="sui-py-1 sui-px-3 sui-text-xs sui-text-neutral-text-medium sui-border-r sui-border-neutral-border sui-text-right">
                 {format(setHours(new Date(), hour), "h a")}
               </div>
               <DroppableDayCell
                 date={setHours(currentDate, hour)}
                 onClick={() => onEventCreate(setHours(currentDate, hour))}
+                className="sui-min-h-[48px]"
               >
                 <div className="sui-grid sui-gap-1 sui-py-1">
                   {hourEvents.map((event) => (
@@ -629,7 +635,7 @@ export function EventCalendar({
   onEventUpdate,
   onEventDelete,
   className,
-  initialView = "month",
+  initialView = "week",
 }: EventCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date("2026-06-15"));
   const [view, setView] = useState<CalendarView>(initialView);
@@ -705,7 +711,7 @@ export function EventCalendar({
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className={`sui-flex sui-flex-col sui-rounded-lg sui-border sui-border-neutral-border sui-bg-white sui-shadow-1 sui-min-h-[500px] ${className || ""}`}>
-        <div className="sui-flex sui-items-center sui-justify-between sui-p-3 sui-border-b sui-border-neutral-border sui-flex-wrap sui-gap-2">
+        <div className="sui-flex sui-items-center sui-justify-between sui-p-2 sui-border-b sui-border-neutral-border sui-flex-wrap sui-gap-2">
           <div className="sui-flex sui-items-center sui-gap-2">
             <LabelButton variantType="secondary" labelText="Today" onClick={handleToday} size="small" />
             <div className="sui-flex sui-items-center sui-gap-0.5">
@@ -724,7 +730,7 @@ export function EventCalendar({
                 <SimpleIcon name="chevron_right" size="s" />
               </button>
             </div>
-            <h2 className="sui-heading-sm sui-text-neutral-text">{viewTitle}</h2>
+            <h2 className="sui-text-base sui-font-semibold sui-text-neutral-text">{viewTitle}</h2>
           </div>
           <div className="sui-flex sui-items-center sui-gap-2">
             <div className="sui-flex sui-items-center sui-gap-3 sui-mr-2">
@@ -740,7 +746,7 @@ export function EventCalendar({
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="sui-flex sui-items-center sui-gap-1 sui-rounded-full sui-border sui-border-neutral-border sui-bg-white sui-px-2 sui-py-1 sui-text-sm sui-font-medium sui-text-neutral-text hover:sui-bg-neutral-background-medium sui-transition-colors">
+                <button className="sui-flex sui-items-center sui-gap-1 sui-rounded-full sui-border sui-border-neutral-border sui-bg-white sui-px-2 sui-py-0.5 sui-text-xs sui-font-medium sui-text-neutral-text hover:sui-bg-neutral-background-medium sui-transition-colors">
                   {view.charAt(0).toUpperCase() + view.slice(1)}
                   <SimpleIcon name="expand_more" size="s" />
                 </button>

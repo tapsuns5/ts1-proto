@@ -9,12 +9,17 @@ import { EventCalendar, CalendarEvent } from "@/components/event-calendar/EventC
 import Tabs from "@/components/Tabs/Tabs";
 import LabelButton from "@/components/LabelButton/LabelButton";
 import Input from "@/components/Input/Input";
-import Status from "@/components/Status/Status";
 import Table from "@/components/table/Table/Table";
 import { useTableHelpers, useTablePagination } from "@/components/table/Table/hooks";
 import { Columns } from "@/components/table/Table/Table.types";
 import Pagination from "@/components/table/Pagination/Pagination";
 import { TextLink } from "@/components/TextLink/TextLink";
+import { VenueScheduleView, type VenueGroup } from "@/components/programs/VenueScheduleView";
+import Combobox from "@/components/Combobox/Combobox";
+import { ComboboxTrigger } from "@/components/Combobox/components/ComboboxTrigger";
+import { ComboboxContent } from "@/components/Combobox/Combobox";
+import { ComboboxList } from "@/components/Combobox/components/ComboboxList";
+import { ComboboxItem } from "@/components/Combobox/components/ComboboxItem";
 
 const mockNavItems: NavItem[] = [
   { label: "Registrations", icon: "view_cozy", href: "/organizations/1/registrations" },
@@ -113,27 +118,47 @@ const initialEvents: CalendarEvent[] = [
   { id: "21", title: "13U-AAA vs Bears", start: new Date("2026-07-05T18:00:00"), end: new Date("2026-07-05T19:30:00"), eventType: "game", venueName: "Main Stadium", teams: ["13U-AAA", "Bears"], status: "scheduled" },
 ];
 
-interface VenueScheduleItem {
-  id: string;
-  date: string;
-  time: string;
-  name: string;
-  type: "game" | "practice" | "other";
-  teams: string[];
-  venueName: string;
-  subVenueName?: string;
-  status: "scheduled" | "pending" | "canceled";
-}
-
-const mockVenueScheduleItems: VenueScheduleItem[] = [
-  { id: "1", date: "2025-04-05", time: "09:00 AM", name: "BearsZ vs Tigers", type: "game", teams: ["BearsZ", "Tigers"], venueName: "Main Stadium", subVenueName: "Field 1", status: "scheduled" },
-  { id: "2", date: "2025-04-05", time: "11:00 AM", name: "Thunder Hawks vs Red Wolves", type: "game", teams: ["Thunder Hawks", "Red Wolves"], venueName: "Field A", status: "scheduled" },
-  { id: "3", date: "2025-04-07", time: "06:00 PM", name: "Lions Practice", type: "practice", teams: ["Lions"], venueName: "Field B", subVenueName: "Secondary", status: "scheduled" },
-  { id: "4", date: "2025-04-12", time: "09:00 AM", name: "Eagles vs Blue Strikers", type: "game", teams: ["Eagles", "Blue Strikers"], venueName: "Field A", status: "scheduled" },
-  { id: "5", date: "2025-04-14", time: "06:00 PM", name: "Silver Sharks Practice", type: "practice", teams: ["Silver Sharks"], venueName: "Community Center", subVenueName: "Gym", status: "pending" },
-  { id: "6", date: "2025-04-19", time: "09:00 AM", name: "Tournament: Opening Round", type: "other", teams: ["All Teams"], venueName: "Main Stadium", subVenueName: "Field 1", status: "scheduled" },
-  { id: "7", date: "2025-04-26", time: "09:00 AM", name: "Green Gators vs Golden Eagles", type: "game", teams: ["Green Gators", "Golden Eagles"], venueName: "Field B", status: "canceled" },
-  { id: "8", date: "2025-04-28", time: "06:00 PM", name: "Storm Breakers Practice", type: "practice", teams: ["Storm Breakers"], venueName: "Field A", status: "scheduled" },
+const mockVenueGroups: VenueGroup[] = [
+  {
+    name: "Riverside Athletic Park",
+    subVenues: [
+      {
+        name: "Field 1",
+        events: [
+          { id: "f1-1", title: "10U Eagles vs 10U Bulls", start: "09:00", end: "11:00", type: "game", teams: ["10U Eagles", "10U Bulls"] },
+          { id: "f1-2", title: "8U Hawks Practice", start: "13:00", end: "14:30", type: "practice", teams: ["8U Hawks"] },
+        ],
+      },
+      {
+        name: "Field 2",
+        events: [
+          { id: "f2-1", title: "12U Tigers Practice", start: "10:00", end: "11:30", type: "practice", teams: ["12U Tigers"] },
+          { id: "f2-2", title: "14U Lions vs 14U Cobras", start: "14:00", end: "16:00", type: "game", teams: ["14U Lions", "14U Cobras"] },
+        ],
+      },
+      { name: "Field 3", events: [] },
+      {
+        name: "Field 4",
+        events: [
+          { id: "f4-1", title: "Field Setup", start: "08:00", end: "10:00", type: "other" },
+          { id: "f4-2", title: "8U Sharks vs 8U Hawks", start: "12:00", end: "13:30", type: "game", teams: ["8U Sharks", "8U Hawks"] },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Oakwood Sports Complex",
+    subVenues: [
+      {
+        name: "Court 1",
+        events: [
+          { id: "c1-1", title: "Bantam A Game", start: "09:00", end: "11:00", type: "game", teams: ["Bantam A"] },
+          { id: "c1-2", title: "Midget AA Practice", start: "14:00", end: "15:30", type: "practice", teams: ["Midget AA"] },
+        ],
+      },
+      { name: "Court 2", events: [] },
+    ],
+  },
 ];
 
 /* ────────────── Table Configs ────────────── */
@@ -223,68 +248,16 @@ function AllSchedulesTable({ data }: { data: ScheduleRow[] }) {
   );
 }
 
-function VenuesScheduleView({ data }: { data: VenueScheduleItem[] }) {
-  const itemsByDate = useMemo(() => {
-    const sorted = [...data].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
-    return sorted.reduce((acc, item) => {
-      const dateKey = format(new Date(item.date), "EEE MMM d, yyyy");
-      if (!acc[dateKey]) acc[dateKey] = [];
-      acc[dateKey].push(item);
-      return acc;
-    }, {} as Record<string, VenueScheduleItem[]>);
-  }, [data]);
-
-  return (
-    <div className="sui-mb-4">
-      {Object.entries(itemsByDate).map(([date, items]) => (
-        <div key={date} className="sui-mb-4">
-          <div className="sui-sticky sui-top-0 sui-z-10 sui-bg-neutral-background sui-px-3 sui-py-2 sui-text-label sui-font-semibold sui-border-b sui-border-neutral-border">
-            {date}
-          </div>
-          <div className="sui-bg-white sui-border-l sui-border-r sui-border-b sui-border-neutral-border sui-rounded-b-lg">
-            {items.map((item, idx) => (
-              <div
-                key={item.id}
-                className={`sui-grid sui-grid-cols-[12%_25%_12%_20%_20%_11%] sui-items-center sui-py-3 sui-px-3 sui-body-dense ${idx !== items.length - 1 ? "sui-border-b sui-border-neutral-border" : ""}`}
-              >
-                <div className="sui-text-left">{item.time}</div>
-                <div className={`sui-text-left ${item.status === "canceled" ? "sui-line-through" : ""}`}>
-                  <TextLink href="#" variantType="primary">
-                    {item.name}
-                  </TextLink>
-                </div>
-                <div className="sui-text-center sui-capitalize sui-text-label-sm">{item.type}</div>
-                <div className="sui-text-left">{item.teams.join(", ")}</div>
-                <div className="sui-text-left">
-                  <p>{item.venueName}</p>
-                  {item.subVenueName && (
-                    <p className="sui-text-xs sui-text-neutral-text-medium">{item.subVenueName}</p>
-                  )}
-                </div>
-                <div className="sui-text-center">
-                  {item.status === "scheduled" && <Status state="success" text="Scheduled" />}
-                  {item.status === "pending" && <Status state="warning" text="Unscheduled" />}
-                  {item.status === "canceled" && <Status state="inactive" text="Canceled" />}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-      {data.length === 0 && (
-        <p className="sui-p-4 sui-text-center">No events found for the selected venue filters.</p>
-      )}
-    </div>
-  );
-}
-
 export default function SchedulePage() {
   const params = useParams() as { orgId: string; programId: string };
   const [activeTab, setActiveTab] = useState("all-schedules");
   const [events, setEvents] = useState<CalendarEvent[]>(initialEvents);
   const [searchQuery, setSearchQuery] = useState("");
+  const [venueDate, setVenueDate] = useState(new Date("2026-03-10T00:00:00"));
+  const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
+  const [selectedDivisions, setSelectedDivisions] = useState<string[]>([]);
+  const [selectedVenues, setSelectedVenues] = useState<string[]>([]);
+  const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
 
   const breadcrumbs: BreadcrumbItem[] = [
     { label: "Programs", href: `/organizations/${params.orgId}/programs` },
@@ -312,17 +285,6 @@ export default function SchedulePage() {
       (s) =>
         s.program.toLowerCase().includes(q) ||
         s.divisions.some((d) => d.toLowerCase().includes(q))
-    );
-  }, [searchQuery]);
-
-  const filteredVenueSchedule = useMemo(() => {
-    if (!searchQuery.trim()) return mockVenueScheduleItems;
-    const q = searchQuery.toLowerCase();
-    return mockVenueScheduleItems.filter(
-      (v) =>
-        v.name.toLowerCase().includes(q) ||
-        v.venueName.toLowerCase().includes(q) ||
-        v.teams.some((t) => t.toLowerCase().includes(q))
     );
   }, [searchQuery]);
 
@@ -356,12 +318,94 @@ export default function SchedulePage() {
       label: "Calendar",
       content: (
         <div className="sui-mx-auto sui-pt-4">
+          {/* Filter bar */}
+          <div className="sui-flex sui-flex-wrap sui-items-center sui-gap-2 sui-p-2 sui-border-b sui-border-neutral-border sui-mb-2">
+            <Combobox
+              values={selectedPrograms}
+              onValuesChange={(vals) => setSelectedPrograms(vals)}
+            >
+              <ComboboxTrigger label="All Programs" />
+              <ComboboxContent headerTitle="Select programs">
+                <ComboboxList showSelectAllOption>
+                  <ComboboxItem value="Spring 2025 Soccer" label="Spring 2025 Soccer" keywords={["Spring 2025 Soccer"]} />
+                  <ComboboxItem value="Summer 2025 Baseball" label="Summer 2025 Baseball" keywords={["Summer 2025 Baseball"]} />
+                  <ComboboxItem value="Fall 2025 Football" label="Fall 2025 Football" keywords={["Fall 2025 Football"]} />
+                  <ComboboxItem value="Winter 2025 Basketball" label="Winter 2025 Basketball" keywords={["Winter 2025 Basketball"]} />
+                </ComboboxList>
+              </ComboboxContent>
+            </Combobox>
+
+            <Combobox
+              values={selectedDivisions}
+              onValuesChange={(vals) => setSelectedDivisions(vals)}
+            >
+              <ComboboxTrigger label="All Divisions / Teams" />
+              <ComboboxContent headerTitle="Select divisions / teams">
+                <ComboboxList showSelectAllOption>
+                  <ComboboxItem value="10U" label="10U" keywords={["10U"]} />
+                  <ComboboxItem value="12U" label="12U" keywords={["12U"]} />
+                  <ComboboxItem value="14U" label="14U" keywords={["14U"]} />
+                  <ComboboxItem value="8U" label="8U" keywords={["8U"]} />
+                </ComboboxList>
+              </ComboboxContent>
+            </Combobox>
+
+            <Combobox
+              values={selectedVenues}
+              onValuesChange={(vals) => setSelectedVenues(vals)}
+            >
+              <ComboboxTrigger label="All Venues" />
+              <ComboboxContent headerTitle="Select venues">
+                <ComboboxList showSelectAllOption>
+                  <ComboboxItem value="Main Stadium" label="Main Stadium" keywords={["Main Stadium"]} />
+                  <ComboboxItem value="Field A" label="Field A" keywords={["Field A"]} />
+                  <ComboboxItem value="Field B" label="Field B" keywords={["Field B"]} />
+                  <ComboboxItem value="Community Center" label="Community Center" keywords={["Community Center"]} />
+                  <ComboboxItem value="Indoor Facility" label="Indoor Facility" keywords={["Indoor Facility"]} />
+                  <ComboboxItem value="Community Park" label="Community Park" keywords={["Community Park"]} />
+                </ComboboxList>
+              </ComboboxContent>
+            </Combobox>
+
+            <Combobox
+              values={selectedEventTypes}
+              onValuesChange={(vals) => setSelectedEventTypes(vals)}
+            >
+              <ComboboxTrigger label="All Event Types" />
+              <ComboboxContent headerTitle="Select event types">
+                <ComboboxList showSelectAllOption>
+                  <ComboboxItem value="game" label="Game" keywords={["Game"]} />
+                  <ComboboxItem value="practice" label="Practice" keywords={["Practice"]} />
+                  <ComboboxItem value="other" label="Other event" keywords={["Other event"]} />
+                </ComboboxList>
+              </ComboboxContent>
+            </Combobox>
+
+            <div className="sui-flex sui-items-center sui-gap-2 sui-ml-auto">
+              <button className="sui-font-semibold sui-rounded-full sui-border sui-border-solid sui-cursor-pointer sui-transition-all sui-flex sui-items-center sui-gap-2 sui-flex-shrink-0 sui-bg-white sui-text-admin-action-text sui-border-admin-action-border hover:sui-bg-admin-action-background-weak-hover active:sui-scale-95 sui-text-sm sui-h-[32px] sui-pl-[18px] sui-pr-3 sui-py-0">
+                <span className="material-symbols-rounded sui-text-xl">location_on</span>
+                <span>Manage</span>
+              </button>
+              <button className="sui-font-semibold sui-rounded-full sui-border sui-border-solid sui-cursor-pointer sui-transition-all sui-flex sui-items-center sui-gap-2 sui-flex-shrink-0 sui-bg-white sui-text-admin-action-text sui-border-admin-action-border hover:sui-bg-admin-action-background-weak-hover active:sui-scale-95 sui-text-sm sui-h-[32px] sui-pl-[18px] sui-pr-3 sui-py-0">
+                <span className="material-symbols-rounded sui-text-xl">download</span>
+                <span>Export</span>
+              </button>
+              <LabelButton
+                variantType="primary"
+                labelText="Add Event"
+                size="small"
+                onClick={() => {
+                  // Handle add event
+                }}
+              />
+            </div>
+          </div>
           <EventCalendar
             events={events}
             onEventAdd={handleEventAdd}
             onEventUpdate={handleEventUpdate}
             onEventDelete={handleEventDelete}
-            initialView="month"
+            initialView="week"
           />
         </div>
       ),
@@ -370,24 +414,11 @@ export default function SchedulePage() {
       value: "venues",
       label: "Venues",
       content: (
-        <section className="sui-mt-1">
-          <div className="sui-flex sui-flex-col sui-gap-1 sui-my-2 sui-flex-wrap sui-py-2">
-            <Input
-              name="venue-search"
-              leftIcon="search"
-              allowClear
-              type="text"
-              placeholder="Search by event, venue, or team name"
-              size="small"
-              inputProps={{ autoComplete: "off" }}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setSearchQuery(e.target.value)
-              }
-              className="sui-flex-1 sui-max-w-[400px]"
-            />
-          </div>
-          <VenuesScheduleView data={filteredVenueSchedule} />
-        </section>
+        <VenueScheduleView
+          date={venueDate}
+          onDateChange={setVenueDate}
+          venueGroups={mockVenueGroups}
+        />
       ),
     },
   ];
@@ -402,16 +433,7 @@ export default function SchedulePage() {
       userInitials="JD"
       onHelpClick={() => console.log("Help clicked")}
     >
-      <div className="sui-px-2 md:sui-px-2 lg:sui-px-2 sui-mx-auto sui-max-w-full sui-overflow-x-hidden sui-relative sui-pt-4">
-        <header className="sui-flex sui-justify-end sui-min-h-[48px]">
-          <LabelButton
-            variantType="primary"
-            icon="add"
-            iconPosition="left"
-            labelText="New Schedule"
-            onClick={() => console.log("New schedule clicked")}
-          />
-        </header>
+      <div className="sui-px-2 md:sui-px-2 lg:sui-px-2 sui-mx-auto sui-max-w-full sui-overflow-x-hidden sui-relative sui-pt-0">
         <Tabs
           tabs={tabs}
           value={activeTab}

@@ -78,7 +78,7 @@ export function Sidebar({
           </button>
         </div>
 
-        <nav aria-label="Main" className="sui-flex-1 sui-px-1 sui-overflow-hidden">
+        <nav aria-label="Main" className="sui-flex-1 sui-overflow-hidden">
           <ul className="sui-grid sui-gap-1">
             {navItems.map((item) => (
               <li key={item.href} className="sui-relative sui-w-full">
