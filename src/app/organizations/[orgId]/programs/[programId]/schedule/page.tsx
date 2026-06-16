@@ -317,9 +317,9 @@ export default function SchedulePage() {
       value: "calendar",
       label: "Calendar",
       content: (
-        <div className="sui-mx-auto sui-pt-4">
+        <div className="sui-mx-auto">
           {/* Filter bar */}
-          <div className="sui-flex sui-flex-wrap sui-items-center sui-justify-between sui-gap-2 sui-p-2 sui-border-b sui-border-neutral-border sui-mb-2">
+          <div className="sui-flex sui-flex-wrap sui-items-center sui-justify-between sui-gap-2 sui-p-2 sui-mb-2">
             <div className="sui-flex sui-flex-wrap sui-items-center sui-gap-2">
               <Combobox
                 values={selectedPrograms}
@@ -435,7 +435,7 @@ export default function SchedulePage() {
       userInitials="JD"
       onHelpClick={() => console.log("Help clicked")}
     >
-      <div className="sui-px-2 md:sui-px-2 lg:sui-px-2 sui-mx-auto sui-max-w-full sui-overflow-x-hidden sui-relative sui-pt-0">
+      <div className="sui-mx-auto sui-max-w-full sui-overflow-x-hidden sui-relative sui-pt-0">
         <Tabs
           tabs={tabs}
           value={activeTab}

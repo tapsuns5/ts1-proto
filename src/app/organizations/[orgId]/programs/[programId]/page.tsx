@@ -6,6 +6,7 @@ import { NavItem, BreadcrumbItem } from "@/components/layout/types";
 import { ProgramHeader } from "@/components/programs/ProgramHeader";
 import { ProgramTabs } from "@/components/programs/ProgramTabs";
 import { ScheduleTab } from "@/components/programs/ScheduleTab";
+import { TeamsTab } from "@/components/programs/TeamsTab";
 import { EditProgramDialog } from "@/components/programs/EditProgramDialog";
 
 const mockNavItems: NavItem[] = [
@@ -111,6 +112,42 @@ const mockProgram = {
   enableStandings: false,
 };
 
+const mockDivisions = [
+  {
+    id: "23575",
+    name: "8U",
+    teams: [
+      { id: "42610", name: "Dodgers", players: 3, staff: 1 },
+      { id: "42611", name: "Marlins", players: 2, staff: 2 },
+    ],
+    totalPlayers: 5,
+    totalStaff: 3,
+  },
+  {
+    id: "23574",
+    name: "9U",
+    teams: [
+      { id: "34451", name: "Tyler's Baseball Team", players: 5, staff: 4 },
+    ],
+    totalPlayers: 5,
+    totalStaff: 4,
+  },
+  {
+    id: "23576",
+    name: "10U",
+    teams: [],
+    totalPlayers: 0,
+    totalStaff: 0,
+  },
+  {
+    id: "32716",
+    name: "11U",
+    teams: [],
+    totalPlayers: 0,
+    totalStaff: 0,
+  },
+];
+
 export default function ProgramPage() {
   const [activeTab, setActiveTab] = useState("schedule");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -119,7 +156,17 @@ export default function ProgramPage() {
     {
       id: "teams",
       label: "Teams",
-      content: <div className="sui-p-4">Teams content coming soon</div>,
+      content: (
+        <TeamsTab
+          divisions={mockDivisions}
+          onCreateTeam={(divisionId) => console.log("Create team in division:", divisionId)}
+          onEditTeam={(teamId) => console.log("Edit team:", teamId)}
+          onArchiveTeam={(teamId) => console.log("Archive team:", teamId)}
+          onEditDivision={(divisionId) => console.log("Edit division:", divisionId)}
+          onManageDivisions={() => console.log("Manage divisions")}
+          onCreateTeamGlobal={() => console.log("Create team global")}
+        />
+      ),
     },
     {
       id: "participants",
