@@ -52,13 +52,22 @@ export interface ScheduleEvent {
   scheduleName?: string;
   coaches?: string[];
   coachConflicts?: string[];
+  availability?: "available" | "maybe" | "unavailable" | "unknown";
+  rsvp?: "yes" | "no" | "maybe" | "unknown";
+  availabilityData?: {
+    games?: number;
+    practices?: number;
+    events?: number;
+  };
 }
 
-interface ScheduleTabProps {
+interface TeamsScheduleProps {
   events: ScheduleEvent[];
+  teamName?: string;
+  teamId?: string;
 }
 
-function generateMockEvents(): ScheduleEvent[] {
+function generateMockEvents(teamName?: string, teamId?: string): ScheduleEvent[] {
   const teams = [
     'Thunder Hawks', 'Red Wolves', 'Blue Strikers', 'Green Gators',
     'Silver Sharks', 'Golden Eagles', 'Storm Breakers', 'Iron Rhinos'
@@ -67,6 +76,9 @@ function generateMockEvents(): ScheduleEvent[] {
   const subvenues = ['Field 1', 'Primary', 'Secondary', 'Gym'];
   const scheduleNames = ['Spring 2025', 'Summer 2025', 'Fall 2025', 'Tournament 2025'];
 
+  // If teamName is provided, filter teams to only include that team
+  const relevantTeams = teamName ? [teamName] : teams;
+
   // Check which schedules are already published in localStorage
   const schedules = getCreatedSchedules();
   const publishedNames = new Set(schedules.filter((s) => s.status === 'published').map((s) => s.name));
@@ -74,7 +86,7 @@ function generateMockEvents(): ScheduleEvent[] {
   // 4 coaches for 8 teams so each coach handles 2 teams → guaranteed conflicts
   const teamToCoach: Record<string, string> = {};
   const coaches = ['Coach Mike', 'Coach Sarah', 'Coach Dave', 'Coach Lisa'];
-  teams.forEach((team, idx) => {
+  relevantTeams.forEach((team, idx) => {
     teamToCoach[team] = coaches[Math.floor(idx / 2)];
   });
 
@@ -109,20 +121,25 @@ function generateMockEvents(): ScheduleEvent[] {
 
   conflictSlots.forEach((slot) => {
     slot.games.forEach((g) => {
+      const homeTeam = relevantTeams[g.home % relevantTeams.length];
+      const awayTeam = relevantTeams[g.away % relevantTeams.length];
       mockEvents.push({
         id: `mock-${idCounter++}`,
         date: slot.date,
         time: slot.time,
         timezone: 'America/New_York',
         type: 'game',
-        name: `${teams[g.home]} vs ${teams[g.away]}`,
-        team: `${teams[g.home]} vs ${teams[g.away]}`,
+        name: `${homeTeam} vs ${awayTeam}`,
+        team: `${homeTeam} vs ${awayTeam}`,
         status: publishedNames.has(scheduleNames[0]) ? 'published' : (idCounter % 2 === 0 ? 'published' : 'draft'),
         venue: venues[g.venue],
         subvenue: subvenues[g.venue],
         hasConflict: false,
         scheduleName: scheduleNames[0],
-        coaches: [teamToCoach[teams[g.home]], teamToCoach[teams[g.away]]],
+        coaches: [teamToCoach[homeTeam], teamToCoach[awayTeam]],
+        availability: ['available', 'maybe', 'unavailable', 'unknown'][idCounter % 4] as any,
+        rsvp: ['yes', 'no', 'maybe', 'unknown'][idCounter % 4] as any,
+        availabilityData: { games: idCounter % 5 + 1, practices: idCounter % 3 + 1, events: idCounter % 2 },
       });
     });
   });
@@ -136,23 +153,28 @@ function generateMockEvents(): ScheduleEvent[] {
     const gameTimes = ['09:00 AM', '11:00 AM'];
 
     for (let g = 0; g < 2; g++) {
-      const home = (dayIdx * 2 + g) % teams.length;
-      const away = (home + 2) % teams.length;
+      const home = (dayIdx * 2 + g) % relevantTeams.length;
+      const away = (home + 1) % relevantTeams.length;
       const venueIdx = (dayIdx + g) % venues.length;
+      const homeTeam = relevantTeams[home];
+      const awayTeam = relevantTeams[away];
       mockEvents.push({
         id: `mock-${idCounter++}`,
         date,
         time: gameTimes[g],
         timezone: 'America/New_York',
         type: 'game',
-        name: `${teams[home]} vs ${teams[away]}`,
-        team: `${teams[home]} vs ${teams[away]}`,
+        name: `${homeTeam} vs ${awayTeam}`,
+        team: `${homeTeam} vs ${awayTeam}`,
         status: publishedNames.has(scheduleNames[scheduleIdx]) ? 'published' : 'draft',
         venue: venues[venueIdx],
         subvenue: subvenues[venueIdx],
         hasConflict: false,
         scheduleName: scheduleNames[scheduleIdx],
-        coaches: [teamToCoach[teams[home]], teamToCoach[teams[away]]],
+        coaches: [teamToCoach[homeTeam], teamToCoach[awayTeam]],
+        availability: ['available', 'maybe', 'unavailable', 'unknown'][idCounter % 4] as any,
+        rsvp: ['yes', 'no', 'maybe', 'unknown'][idCounter % 4] as any,
+        availabilityData: { games: idCounter % 5 + 1, practices: idCounter % 3 + 1, events: idCounter % 2 },
       });
     }
   });
@@ -167,23 +189,28 @@ function generateMockEvents(): ScheduleEvent[] {
     );
   }
   fridayDates.forEach((date, idx) => {
-    const home = idx % teams.length;
-    const away = (home + 3) % teams.length;
+    const home = idx % relevantTeams.length;
+    const away = (home + 1) % relevantTeams.length;
     const fridaySchedIdx = idx % scheduleNames.length;
+    const homeTeam = relevantTeams[home];
+    const awayTeam = relevantTeams[away];
     mockEvents.push({
       id: `mock-${idCounter++}`,
       date,
       time: '06:00 PM',
       timezone: 'America/New_York',
       type: 'game',
-      name: `${teams[home]} vs ${teams[away]}`,
-      team: `${teams[home]} vs ${teams[away]}`,
+      name: `${homeTeam} vs ${awayTeam}`,
+      team: `${homeTeam} vs ${awayTeam}`,
       status: publishedNames.has(scheduleNames[fridaySchedIdx]) ? 'published' : 'draft',
       venue: venues[idx % venues.length],
       subvenue: subvenues[idx % venues.length],
+      availability: ['available', 'maybe', 'unavailable', 'unknown'][idCounter % 4] as any,
+      rsvp: ['yes', 'no', 'maybe', 'unknown'][idCounter % 4] as any,
+      availabilityData: { games: idCounter % 5 + 1, practices: idCounter % 3 + 1, events: idCounter % 2 },
       hasConflict: false,
       scheduleName: scheduleNames[idx % scheduleNames.length],
-      coaches: [teamToCoach[teams[home]], teamToCoach[teams[away]]],
+      coaches: [teamToCoach[homeTeam], teamToCoach[awayTeam]],
     });
   });
 
@@ -200,7 +227,7 @@ function generateMockEvents(): ScheduleEvent[] {
     );
   }
   weekdayDates.forEach((date, idx) => {
-    const team = teams[idx % teams.length];
+    const team = relevantTeams[idx % relevantTeams.length];
     mockEvents.push({
       id: `mock-${idCounter++}`,
       date,
@@ -215,6 +242,9 @@ function generateMockEvents(): ScheduleEvent[] {
       hasConflict: false,
       scheduleName: scheduleNames[idx % scheduleNames.length],
       coaches: [teamToCoach[team]],
+      availability: ['available', 'maybe', 'unavailable', 'unknown'][idCounter % 4] as any,
+      rsvp: ['yes', 'no', 'maybe', 'unknown'][idCounter % 4] as any,
+      availabilityData: { games: idCounter % 5 + 1, practices: idCounter % 3 + 1, events: idCounter % 2 },
     });
   });
 
@@ -308,7 +338,7 @@ function processCoachConflicts(events: ScheduleEvent[]) {
   });
 }
 
-function loadGeneratedEvents(): ScheduleEvent[] {
+function loadGeneratedEvents(teamName?: string, teamId?: string): ScheduleEvent[] {
   try {
     const raw = localStorage.getItem('auto-scheduler-c-events');
     let parsed: Array<{
@@ -329,7 +359,7 @@ function loadGeneratedEvents(): ScheduleEvent[] {
     }
 
     if (!parsed || parsed.length === 0) {
-      const events = generateMockEvents();
+      const events = generateMockEvents(teamName, teamId);
       processCoachConflicts(events);
       return events;
     }
@@ -347,22 +377,30 @@ function loadGeneratedEvents(): ScheduleEvent[] {
         team: `${e.homeTeam} vs ${e.awayTeam}`,
         status: (e.status === 'draft' ? 'draft' : e.status === 'published' ? 'published' : 'canceled') as 'draft' | 'published' | 'canceled',
         venue: e.venueLabel,
+        availability: ['available', 'maybe', 'unavailable', 'unknown'][Math.floor(Math.random() * 4)] as any,
+        rsvp: ['yes', 'no', 'maybe', 'unknown'][Math.floor(Math.random() * 4)] as any,
+        availabilityData: { games: Math.floor(Math.random() * 5) + 1, practices: Math.floor(Math.random() * 3) + 1, events: Math.floor(Math.random() * 2) },
         subvenue: '',
         hasConflict: false,
         scheduleName: sched?.name || e.scheduleId,
       };
     });
 
-    processCoachConflicts(events);
-    return events;
+    // Filter events by teamName if provided
+    const filteredEvents = teamName 
+      ? events.filter(e => e.team.includes(teamName))
+      : events;
+
+    processCoachConflicts(filteredEvents);
+    return filteredEvents;
   } catch {
-    const events = generateMockEvents();
+    const events = generateMockEvents(teamName, teamId);
     processCoachConflicts(events);
     return events;
   }
 }
 
-export function ScheduleTab({ events }: ScheduleTabProps) {
+export function TeamsSchedule({ events, teamName, teamId }: TeamsScheduleProps) {
   const [selectedEvents, setSelectedEvents] = useState<Set<string>>(new Set());
   const [selectedDate, setSelectedDate] = useState<Set<string>>(new Set());
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
@@ -477,14 +515,14 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
 
   useEffect(() => {
     setIsClientLoaded(true);
-    const combined = [...events, ...loadGeneratedEvents()];
+    const combined = [...events, ...loadGeneratedEvents(teamName, teamId)];
     processCoachConflicts(combined);
     setAllEvents(combined);
     loadCardItems(combined);
 
     const schedules = getCreatedSchedules();
     setScheduleOptions(schedules.map((s) => ({ value: s.name, label: s.name })));
-  }, [events]);
+  }, [events, teamName, teamId]);
 
   const handleWizardGenerated = (scheduleName: string, scheduleId: string, gpt: number) => {
     setScheduleWizardOpen(false);
@@ -913,7 +951,7 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
                 }}
               />
             ) : (
-            <table className="sui-w-full sui-border-spacing-0 sui-border-separate sui-text-body-dense sui-min-w-[600px] sm:sui-min-w-[700px]" data-testid="schedule-table">
+            <table className="sui-w-full sui-border-spacing-0 sui-border-separate sui-text-body-dense sui-min-w-[900px] sm:sui-min-w-[1000px]" data-testid="schedule-table">
             <thead className="[&_th]:sui-border-b [&_th]:sui-border-solid [&_th]:sui-border-neutral-border [&_th]:sui-bg-neutral-background-weak">
               <tr className="sui-group/row [&_td]:sui-border-b [&_td]:sui-border-solid [&_td]:sui-border-neutral-border hover:sui-bg-neutral-background-weak data-[state=selected]:sui-bg-admin-action-background-weak-hover data-[state=selected]:hover:sui-bg-admin-action-background-weak-hover">
                 <th className="sui-p-2 sui-text-left sui-align-middle [&:has([role=checkbox])]:sui-pr-0 sui-text-label !sui-font-semibold sui-min-h-[44px] sui-font-bold sui-w-[40px]">
@@ -968,9 +1006,14 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
                     )}
                   </div>
                 </th>
-                <th className="sui-p-2 sui-text-left sui-align-middle [&:has([role=checkbox])]:sui-pr-0 sui-text-label !sui-font-semibold sui-min-h-[44px] sui-font-bold sui-w-[60px]">
-                  <div className="sui-flex sui-items-center sui-gap-2">
-                  </div>
+                <th className="sui-p-2 sui-text-left sui-align-middle [&:has([role=checkbox])]:sui-pr-0 sui-text-label !sui-font-semibold sui-min-h-[44px] sui-font-bold sui-w-[150px]">
+                  <div className="sui-flex sui-items-center sui-gap-2">Availability</div>
+                </th>
+                <th className="sui-p-2 sui-text-left sui-align-middle [&:has([role=checkbox])]:sui-pr-0 sui-text-label !sui-font-semibold sui-min-h-[44px] sui-font-bold sui-w-[100px]">
+                  <div className="sui-flex sui-items-center sui-gap-2">RSVP</div>
+                </th>
+                <th className="sui-p-2 sui-text-left sui-align-middle [&:has([role=checkbox])]:sui-pr-0 sui-text-label !sui-font-semibold sui-min-h-[44px] sui-font-bold sui-w-[60px] sui-pr-4">
+                  <div className="sui-flex sui-items-center sui-gap-2"></div>
                 </th>
               </tr>
             </thead>
@@ -978,7 +1021,7 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
               {Object.entries(groupedEvents).map(([date, dateEvents]) => (
                 <Fragment key={date}>
                   <tr className="sui-group/row [&_td]:sui-border-b [&_td]:sui-border-solid [&_td]:sui-border-neutral-border hover:sui-bg-neutral-background-weak data-[state=selected]:sui-bg-admin-action-background-weak-hover data-[state=selected]:hover:sui-bg-admin-action-background-weak-hover">
-                    <td className="sui-align-middle [&:has([role=checkbox])]:sui-pr-0 sui-font-bold sui-text-neutral-primary sui-bg-white sui-sticky sui-p-0 sui-z-10 sui-top-[57px]" colSpan={7}>
+                    <td className="sui-align-middle [&:has([role=checkbox])]:sui-pr-0 sui-font-bold sui-text-neutral-primary sui-bg-white sui-sticky sui-p-0 sui-z-10 sui-top-[57px]" colSpan={10}>
                       <div className="sui-py-1 sui-px-2 sui-flex sui-gap-2 sui-items-center">
                         <SimpleCheckbox
                           checked={selectedDate.has(date)}
@@ -1093,6 +1136,54 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
                                 />
                               )}
                             </>
+                          )}
+                        </div>
+                      </td>
+                      <td className={`sui-p-2 sui-align-middle [&:has([role=checkbox])]:sui-pr-0 sui-w-[150px] ${event.status === "canceled" ? "sui-line-through" : ""}`}>
+                        <div className="sui-body-dense sui-flex sui-items-center sui-gap-2">
+                          {event.availabilityData && (
+                            <>
+                              <div className="sui-flex sui-items-center sui-gap-1 sui-text-neutral-text-medium">
+                                <SimpleIcon name="check_circle" size="s" className="sui-text-success-icon" />
+                                <span>{event.availabilityData.games || 0}</span>
+                              </div>
+                              <div className="sui-flex sui-items-center sui-gap-1 sui-text-neutral-text-medium">
+                                <SimpleIcon name="cancel" size="s" className="sui-text-error-icon" />
+                                <span>{event.availabilityData.practices || 0}</span>
+                              </div>
+                              <div className="sui-flex sui-items-center sui-gap-1 sui-text-neutral-text-medium">
+                                <SimpleIcon name="help" size="s" className="sui-text-warning-icon" />
+                                <span>{event.availabilityData.events || 0}</span>
+                              </div>
+                            </>
+                          )}
+                          {!event.availabilityData && (
+                            <span className="sui-text-neutral-text-medium">—</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className={`sui-p-2 sui-align-middle [&:has([role=checkbox])]:sui-pr-0 sui-w-[100px] ${event.status === "canceled" ? "sui-line-through" : ""}`}>
+                        <div className="sui-body-dense">
+                          {event.rsvp === "yes" && (
+                            <div className="sui-flex sui-items-center sui-gap-1">
+                              <SimpleIcon name="check" size="s" className="sui-text-success-icon" />
+                              <span className="sui-text-success-text">Yes</span>
+                            </div>
+                          )}
+                          {event.rsvp === "no" && (
+                            <div className="sui-flex sui-items-center sui-gap-1">
+                              <SimpleIcon name="close" size="s" className="sui-text-error-icon" />
+                              <span className="sui-text-error-text">No</span>
+                            </div>
+                          )}
+                          {event.rsvp === "maybe" && (
+                            <div className="sui-flex sui-items-center sui-gap-1">
+                              <SimpleIcon name="help" size="s" className="sui-text-warning-icon" />
+                              <span className="sui-text-warning-text">Maybe</span>
+                            </div>
+                          )}
+                          {!event.rsvp || event.rsvp === "unknown" && (
+                            <span className="sui-text-neutral-text-medium">—</span>
                           )}
                         </div>
                       </td>

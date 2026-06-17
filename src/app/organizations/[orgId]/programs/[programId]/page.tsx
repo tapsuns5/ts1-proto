@@ -8,6 +8,7 @@ import { ProgramTabs } from "@/components/programs/ProgramTabs";
 import { ScheduleTab } from "@/components/programs/ScheduleTab";
 import { TeamsTab } from "@/components/programs/TeamsTab";
 import { EditProgramDialog } from "@/components/programs/EditProgramDialog";
+import { Participants } from "@/components/programs/Participants";
 
 const mockNavItems: NavItem[] = [
   { label: "Registrations", icon: "view_cozy", href: "/organizations/1/registrations" },
@@ -171,7 +172,7 @@ export default function ProgramPage() {
     {
       id: "participants",
       label: "Participants",
-      content: <div className="sui-p-4">Participants content coming soon</div>,
+      content: <Participants participants={[]} />,
     },
     {
       id: "schedule",
