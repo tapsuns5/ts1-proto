@@ -28,18 +28,10 @@ import {
   isSameDay,
   getHours,
   getMinutes,
-  setHours,
-  setMinutes,
 } from "date-fns";
 import { SimpleIcon } from "@/components/SimpleIcon";
 import LabelButton from "@/components/LabelButton/LabelButton";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/DropdownMenu/DropdownMenu";
-import Tooltip, { TooltipProvider } from "@/components/Tooltip/Tooltip";
+import { TooltipProvider } from "@/components/Tooltip/Tooltip";
 
 export type CalendarView = "month" | "week" | "day";
 
@@ -70,15 +62,15 @@ interface EventCalendarProps {
 }
 
 const typeColorMap: Record<EventType, string> = {
-  game: "sui-bg-[#bbf7d0] sui-text-emerald-900",
-  practice: "sui-bg-[#fed7aa] sui-text-orange-900",
-  other: "sui-bg-[#bae6fd] sui-text-sky-900",
+  game: "sui-bg-green-90 sui-text-green-30",
+  practice: "sui-bg-orange-90 sui-text-orange-30",
+  other: "sui-bg-skyblue-90 sui-text-skyblue-30",
 };
 
 const typeDotMap: Record<EventType, string> = {
-  game: "sui-bg-emerald-500",
-  practice: "sui-bg-orange-500",
-  other: "sui-bg-sky-500",
+  game: "sui-bg-green-50",
+  practice: "sui-bg-orange-60",
+  other: "sui-bg-skyblue-60",
 };
 
 const typeLabelMap: Record<EventType, string> = {
@@ -86,6 +78,31 @@ const typeLabelMap: Record<EventType, string> = {
   practice: "Practice",
   other: "Other",
 };
+
+const START_HOUR = 7;
+const END_HOUR = 23;
+const HOUR_HEIGHT = 48;
+const DAY_HEADER_HEIGHT = 48;
+const TIME_COLUMN_WIDTH = 64;
+
+function getMinutesSinceStart(date: Date): number {
+  return getHours(date) * 60 + getMinutes(date) - START_HOUR * 60;
+}
+
+function eventDurationMinutes(start: Date, end: Date): number {
+  return Math.max((end.getTime() - start.getTime()) / 1000 / 60, 30);
+}
+
+function formatEventTime(date: Date): string {
+  return format(date, "h:mm a");
+}
+
+function formatHour(hour: number): string {
+  if (hour === 0) return "12 AM";
+  if (hour === 12) return "12 PM";
+  if (hour > 12) return `${hour - 12} PM`;
+  return `${hour} AM`;
+}
 
 function useCalendarDnd(onEventUpdate?: (event: CalendarEvent) => void, events: CalendarEvent[] = []) {
   const handleDragEnd = useCallback(
@@ -116,53 +133,6 @@ function useCalendarDnd(onEventUpdate?: (event: CalendarEvent) => void, events: 
   );
 
   return { handleDragEnd };
-}
-
-function EventHoverCard({ event, children }: { event: CalendarEvent; children: React.ReactNode }) {
-  const eventType: EventType = event.eventType || "other";
-  const dotClass = typeDotMap[eventType];
-  const statusText = event.status === "scheduled" ? "Scheduled" : event.status === "pending" ? "Unscheduled" : "Canceled";
-
-  return (
-    <Tooltip
-      content={
-        <div className="sui-min-w-[240px]">
-          <div className="sui-flex sui-items-center sui-gap-2 sui-mb-2">
-            <span className={`sui-h-2 sui-w-2 sui-rounded-full ${dotClass}`} />
-            <span className="sui-font-semibold sui-text-sm">{event.title}</span>
-          </div>
-          <div className="sui-grid sui-gap-1 sui-text-xs sui-text-white/90">
-            {event.teams && event.teams.length > 0 && (
-              <div className="sui-flex sui-gap-1">
-                <span className="sui-text-white/70">Teams:</span>
-                <span>{event.teams.join(", ")}</span>
-              </div>
-            )}
-            {event.venueName && (
-              <div className="sui-flex sui-gap-1">
-                <span className="sui-text-white/70">Venue:</span>
-                <span>{event.venueName}{event.subVenueName ? ` — ${event.subVenueName}` : ""}</span>
-              </div>
-            )}
-            <div className="sui-flex sui-gap-1">
-              <span className="sui-text-white/70">Time:</span>
-              <span>{format(event.start, "h:mm a")} – {format(event.end, "h:mm a")}</span>
-            </div>
-            <div className="sui-flex sui-gap-1">
-              <span className="sui-text-white/70">Type:</span>
-              <span className="sui-capitalize">{typeLabelMap[eventType]}</span>
-            </div>
-            <div className="sui-flex sui-gap-1">
-              <span className="sui-text-white/70">Status:</span>
-              <span>{statusText}</span>
-            </div>
-          </div>
-        </div>
-      }
-    >
-      {children}
-    </Tooltip>
-  );
 }
 
 function DraggableEventItem({
@@ -208,7 +178,7 @@ function DraggableEventItem({
     </div>
   );
 
-  return <EventHoverCard event={event}>{item}</EventHoverCard>;
+  return <CalendarEventBlock event={event}>{item}</CalendarEventBlock>;
 }
 
 function DroppableDayCell({
@@ -343,139 +313,202 @@ function MonthView({
   );
 }
 
+function CalendarTimeGrid({
+  dates,
+  events,
+  onEventSelect,
+}: {
+  dates: Date[];
+  events: CalendarEvent[];
+  onEventSelect: (event: CalendarEvent) => void;
+}) {
+  const hours = Array.from({ length: END_HOUR - START_HOUR + 1 }, (_, i) => START_HOUR + i);
+  const totalHeight = hours.length * HOUR_HEIGHT;
+  const isSingleDay = dates.length === 1;
+
+  return (
+    <div className="sui-border sui-border-neutral-border sui-rounded-lg sui-bg-white sui-overflow-x-auto">
+      <div className="sui-min-w-max">
+        {/* Header row */}
+        <div className="sui-flex sui-border-b sui-border-neutral-border sui-sticky sui-top-0 sui-z-20 sui-bg-white">
+          <div
+            className="sui-flex-shrink-0 sui-bg-neutral-background-weak sui-border-r sui-border-neutral-border"
+            style={{ width: TIME_COLUMN_WIDTH, height: DAY_HEADER_HEIGHT, position: "sticky", left: 0, zIndex: 30 }}
+          />
+          {dates.map((date) => (
+            <div
+              key={date.toISOString()}
+              className="sui-flex-1 sui-flex sui-flex-col sui-items-center sui-justify-center sui-border-r sui-border-neutral-border sui-p-2"
+              style={{ minWidth: isSingleDay ? 280 : 140, height: DAY_HEADER_HEIGHT }}
+            >
+              <span className={`sui-text-xs sui-font-medium ${isToday(date) ? "sui-text-accent-background" : "sui-text-neutral-text-medium"}`}>{format(date, "EEE")}</span>
+              <span className={`sui-text-sm sui-font-semibold ${isToday(date) ? "sui-text-accent-background" : "sui-text-neutral-text"}`}>{format(date, "MMM d")}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Grid body */}
+        <div className="sui-flex" style={{ height: totalHeight }}>
+          {/* Sticky time column */}
+          <div
+            className="sui-flex-shrink-0 sui-bg-neutral-background-weak sui-border-r sui-border-neutral-border"
+            style={{ width: TIME_COLUMN_WIDTH, position: "sticky", left: 0, zIndex: 15 }}
+          >
+            {hours.map((hour) => (
+              <div key={hour} className="sui-flex sui-items-start sui-justify-center sui-text-[10px] sui-text-neutral-text-medium sui-pt-1" style={{ height: HOUR_HEIGHT }}>
+                {formatHour(hour)}
+              </div>
+            ))}
+          </div>
+
+          {/* Day columns */}
+          {dates.map((date) => {
+            const dayEvents = events.filter((e) => isSameDay(new Date(e.start), date));
+            return (
+              <div
+                key={date.toISOString()}
+                className="sui-flex-1 sui-relative sui-border-r sui-border-neutral-border last:sui-border-r-0"
+                style={{ minWidth: isSingleDay ? 280 : 140 }}
+              >
+                {/* Hour grid lines */}
+                {hours.map((hour) => (
+                  <div
+                    key={hour}
+                    className="sui-absolute sui-left-0 sui-right-0 sui-border-b sui-border-neutral-border/50"
+                    style={{ top: (hour - START_HOUR) * HOUR_HEIGHT, height: HOUR_HEIGHT }}
+                  />
+                ))}
+                {/* Events */}
+                {dayEvents.map((event) => {
+                  const start = new Date(event.start);
+                  const end = new Date(event.end);
+                  const top = (getMinutesSinceStart(start) / 60) * HOUR_HEIGHT;
+                  const height = (eventDurationMinutes(start, end) / 60) * HOUR_HEIGHT;
+                  if (top < 0 || top > totalHeight) return null;
+                  const eventType = event.eventType || "other";
+                  return (
+                    <CalendarEventBlock
+                      key={event.id}
+                      event={event}
+                      className={`sui-absolute sui-left-1 sui-right-1 sui-rounded sui-px-2 sui-py-1 sui-text-xs sui-font-medium sui-text-left sui-border sui-border-white/50 sui-shadow-sm sui-overflow-hidden ${typeColorMap[eventType]} sui-cursor-pointer hover:sui-opacity-90`}
+                      style={{ top: Math.max(top, 0), height: Math.max(height, 20), minHeight: 20 }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => onEventSelect(event)}
+                        className="sui-w-full sui-h-full sui-text-left"
+                      >
+                        <p className="sui-truncate sui-font-semibold">{event.title}</p>
+                        <p className="sui-truncate sui-text-[10px] sui-opacity-90">{formatEventTime(start)} – {formatEventTime(end)} · {event.location || event.venueName || "TBD"}</p>
+                      </button>
+                    </CalendarEventBlock>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CalendarEventBlock({
+  event,
+  className,
+  style,
+  children,
+}: {
+  event: CalendarEvent;
+  className?: string;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+}) {
+  const dotColorForType = (type: CalendarEvent["eventType"]) => {
+    if (type === "game") return "sui-bg-green-50";
+    if (type === "practice") return "sui-bg-orange-60";
+    return "sui-bg-skyblue-60";
+  };
+  const [hovered, setHovered] = useState(false);
+  const blockRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+
+  const handleMouseEnter = () => {
+    if (blockRef.current) {
+      const rect = blockRef.current.getBoundingClientRect();
+      const cardWidth = 280;
+      let left = rect.left + rect.width / 2 - cardWidth / 2;
+      left = Math.max(8, Math.min(left, window.innerWidth - cardWidth - 8));
+      const top = rect.top - 8;
+      setPosition({ top, left });
+    }
+    setHovered(true);
+  };
+
+  return (
+    <>
+      <div
+        ref={blockRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={() => setHovered(false)}
+        className={className}
+        style={style}
+      >
+        {children}
+      </div>
+      {hovered && (
+        <div
+          className="sui-fixed sui-z-50 sui-w-[280px] sui-bg-neutral-text sui-text-white sui-rounded-xl sui-shadow-2 sui-p-4 sui-flex sui-flex-col sui-gap-2 sui-translate-y-[-100%]"
+          style={{ top: position.top, left: position.left }}
+        >
+          <div className="sui-flex sui-items-center sui-gap-2 sui-pb-1 sui-border-b sui-border-white/20">
+            <span className={`sui-block sui-size-[10px] sui-rounded-full ${dotColorForType(event.eventType)}`} />
+            <p className="sui-font-semibold sui-text-sm">{event.title}</p>
+          </div>
+          <div className="sui-grid sui-grid-cols-[auto_1fr] sui-gap-x-3 sui-gap-y-1 sui-text-sm">
+            <span className="sui-text-white/70">Teams:</span>
+            <span>{event.teams?.join(", ") || "—"}</span>
+            <span className="sui-text-white/70">Venue:</span>
+            <span>{event.location || event.venueName || "TBD"}{event.subVenueName ? ` · ${event.subVenueName}` : ""}</span>
+            <span className="sui-text-white/70">Time:</span>
+            <span>{formatEventTime(new Date(event.start))} – {formatEventTime(new Date(event.end))}</span>
+            <span className="sui-text-white/70">Type:</span>
+            <span className="sui-capitalize">{event.eventType || "other"}</span>
+            <span className="sui-text-white/70">Status:</span>
+            <span className="sui-capitalize">{event.status === "canceled" ? "Cancelled" : event.status || "scheduled"}</span>
+          </div>
+          <div className="sui-absolute sui-size-[10px] sui-bg-neutral-text sui-rotate-45 sui-left-1/2 -sui-translate-x-1/2 sui-bottom-[-5px]" />
+        </div>
+      )}
+    </>
+  );
+}
+
 function WeekView({
   currentDate,
   events,
   onEventSelect,
-  onEventCreate,
 }: {
   currentDate: Date;
   events: CalendarEvent[];
   onEventSelect: (event: CalendarEvent) => void;
-  onEventCreate: (date: Date) => void;
 }) {
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
   const weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
-  const hours = Array.from({ length: 24 }, (_, i) => i);
-
-  const getEventsForDayAndHour = useCallback(
-    (day: Date, hour: number) =>
-      events.filter((e) => {
-        const s = new Date(e.start);
-        return isSameDay(s, day) && getHours(s) === hour;
-      }),
-    [events]
-  );
-
-  return (
-    <div className="sui-flex sui-flex-col sui-flex-1 sui-overflow-auto">
-      <div className="sui-grid sui-grid-cols-8 sui-border-b sui-border-neutral-border sui-min-w-[800px]">
-        <div className="sui-py-1 sui-text-center sui-text-xs sui-font-semibold sui-text-neutral-text-medium sui-border-r sui-border-neutral-border" />
-        {days.map((d) => (
-          <div
-            key={d.toISOString()}
-            className={`sui-py-1 sui-text-center sui-text-xs sui-font-semibold sui-border-r sui-border-neutral-border last:sui-border-r-0
-              ${isToday(d) ? "sui-text-accent-background" : "sui-text-neutral-text-medium"}
-            `}
-          >
-            <div>{format(d, "EEE")}</div>
-            <div className={`sui-text-sm sui-mt-0.5 ${isToday(d) ? "sui-bg-accent-background sui-text-white sui-w-3 sui-h-3 sui-rounded-full sui-flex sui-items-center sui-justify-center sui-mx-auto" : ""}`}>
-              {format(d, "d")}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="sui-flex-1 sui-overflow-auto sui-min-w-[800px]">
-        {hours.map((hour) => (
-          <div key={hour} className="sui-grid sui-grid-cols-8 sui-border-b sui-border-neutral-border last:sui-border-b-0">
-            <div className="sui-py-1 sui-px-2 sui-text-xs sui-text-neutral-text-medium sui-border-r sui-border-neutral-border sui-text-right">
-              {format(setHours(new Date(), hour), "h a")}
-            </div>
-            {days.map((day) => {
-              const hourEvents = getEventsForDayAndHour(day, hour);
-              return (
-                <DroppableDayCell
-                  key={`${day.toISOString()}-${hour}`}
-                  date={setHours(day, hour)}
-                  onClick={() => onEventCreate(setHours(day, hour))}
-                  className="sui-min-h-[48px]"
-                >
-                  <div className="sui-grid sui-gap-0.5">
-                    {hourEvents.map((event) => (
-                      <DraggableEventItem
-                        key={event.id}
-                        event={event}
-                        onSelect={onEventSelect}
-                      />
-                    ))}
-                  </div>
-                </DroppableDayCell>
-              );
-            })}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  return <CalendarTimeGrid dates={days} events={events} onEventSelect={onEventSelect} />;
 }
 
 function DayView({
   currentDate,
   events,
   onEventSelect,
-  onEventCreate,
 }: {
   currentDate: Date;
   events: CalendarEvent[];
   onEventSelect: (event: CalendarEvent) => void;
-  onEventCreate: (date: Date) => void;
 }) {
-  const hours = Array.from({ length: 24 }, (_, i) => i);
-
-  const getEventsForHour = useCallback(
-    (hour: number) =>
-      events.filter((e) => {
-        const s = new Date(e.start);
-        return isSameDay(s, currentDate) && getHours(s) === hour;
-      }),
-    [events, currentDate]
-  );
-
-  return (
-    <div className="sui-flex sui-flex-col sui-flex-1 sui-overflow-auto">
-      <div className="sui-py-2 sui-text-center sui-text-base sui-font-semibold sui-border-b sui-border-neutral-border">
-        {format(currentDate, "EEEE, MMMM d, yyyy")}
-      </div>
-      <div className="sui-flex-1">
-        {hours.map((hour) => {
-          const hourEvents = getEventsForHour(hour);
-          return (
-            <div key={hour} className="sui-grid sui-grid-cols-[80px_1fr] sui-border-b sui-border-neutral-border last:sui-border-b-0">
-              <div className="sui-py-1 sui-px-3 sui-text-xs sui-text-neutral-text-medium sui-border-r sui-border-neutral-border sui-text-right">
-                {format(setHours(new Date(), hour), "h a")}
-              </div>
-              <DroppableDayCell
-                date={setHours(currentDate, hour)}
-                onClick={() => onEventCreate(setHours(currentDate, hour))}
-                className="sui-min-h-[48px]"
-              >
-                <div className="sui-grid sui-gap-1 sui-py-1">
-                  {hourEvents.map((event) => (
-                    <DraggableEventItem
-                      key={event.id}
-                      event={event}
-                      onSelect={onEventSelect}
-                    />
-                  ))}
-                </div>
-              </DroppableDayCell>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+  return <CalendarTimeGrid dates={[currentDate]} events={events} onEventSelect={onEventSelect} />;
 }
 
 function EventDialog({
@@ -696,67 +729,28 @@ export function EventCalendar({
     setSelectedEvent(null);
   };
 
-  const viewTitle = useMemo(() => {
-    if (view === "month") return format(currentDate, "MMMM yyyy");
-    if (view === "week") {
-      const start = startOfWeek(currentDate, { weekStartsOn: 0 });
-      const end = endOfWeek(currentDate, { weekStartsOn: 0 });
-      return isSameMonth(start, end)
-        ? format(start, "MMMM yyyy")
-        : `${format(start, "MMM")} – ${format(end, "MMM yyyy")}`;
-    }
-    return format(currentDate, "EEEE, MMMM d, yyyy");
-  }, [currentDate, view]);
-
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className={`sui-flex sui-flex-col sui-rounded-lg sui-border sui-border-neutral-border sui-bg-white sui-shadow-1 sui-min-h-[500px] ${className || ""}`}>
         <div className="sui-flex sui-items-center sui-justify-between sui-p-2 sui-border-b sui-border-neutral-border sui-flex-wrap sui-gap-2">
           <div className="sui-flex sui-items-center sui-gap-2">
             <LabelButton variantType="secondary" labelText="Today" onClick={handleToday} size="small" />
-            <div className="sui-flex sui-items-center sui-gap-0.5">
-              <button
-                onClick={handlePrevious}
-                className="sui-p-1 sui-rounded sui-hover:sui-bg-neutral-background-medium sui-transition-colors"
-                aria-label="Previous"
-              >
-                <SimpleIcon name="chevron_left" size="s" />
-              </button>
-              <button
-                onClick={handleNext}
-                className="sui-p-1 sui-rounded sui-hover:sui-bg-neutral-background-medium sui-transition-colors"
-                aria-label="Next"
-              >
-                <SimpleIcon name="chevron_right" size="s" />
-              </button>
-            </div>
-            <h2 className="sui-text-base sui-font-semibold sui-text-neutral-text">{viewTitle}</h2>
           </div>
           <div className="sui-flex sui-items-center sui-gap-2">
             <div className="sui-flex sui-items-center sui-gap-3 sui-mr-2">
-              <span className="sui-flex sui-items-center sui-gap-1 sui-text-xs sui-text-neutral-text-medium">
-                <span className="sui-inline-block sui-h-1 sui-w-1 sui-rounded-full sui-bg-[#34d399]" /> Game
+              <span className="sui-flex sui-items-center sui-gap-1 sui-caption">
+                <span className={`sui-block sui-size-[12px] ${typeDotMap.game} sui-rounded-full`} />
+                <span className="hidden sm:inline">Game</span>
               </span>
-              <span className="sui-flex sui-items-center sui-gap-1 sui-text-xs sui-text-neutral-text-medium">
-                <span className="sui-inline-block sui-h-1 sui-w-1 sui-rounded-full sui-bg-[#fb923c]" /> Practice
+              <span className="sui-flex sui-items-center sui-gap-1 sui-caption">
+                <span className={`sui-block sui-size-[12px] ${typeDotMap.practice} sui-rounded-full`} />
+                <span className="hidden sm:inline">Practice</span>
               </span>
-              <span className="sui-flex sui-items-center sui-gap-1 sui-text-xs sui-text-neutral-text-medium">
-                <span className="sui-inline-block sui-h-1 sui-w-1 sui-rounded-full sui-bg-[#38bdf8]" /> Other
+              <span className="sui-flex sui-items-center sui-gap-1 sui-caption">
+                <span className={`sui-block sui-size-[12px] ${typeDotMap.other} sui-rounded-full`} />
+                <span className="hidden sm:inline">Other</span>
               </span>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="sui-flex sui-items-center sui-gap-1 sui-rounded-full sui-border sui-border-neutral-border sui-bg-white sui-px-2 sui-py-0.5 sui-text-xs sui-font-medium sui-text-neutral-text hover:sui-bg-neutral-background-medium sui-transition-colors">
-                  {view.charAt(0).toUpperCase() + view.slice(1)}
-                  <SimpleIcon name="expand_more" size="s" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setView("month")}>Month</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setView("week")}>Week</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setView("day")}>Day</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
             <LabelButton
               variantType="primary"
               labelText="New Event"
@@ -769,8 +763,48 @@ export function EventCalendar({
           </div>
         </div>
 
+        {/* Calendar sub-tabs and date navigation */}
+        <div className="sui-flex sui-items-center sui-gap-2 sui-px-3 sui-py-2 sui-border-b sui-border-solid sui-border-neutral-border sui-bg-white">
+          <div className="sui-flex sui-bg-neutral-background-weak sui-rounded-full sui-p-1 sui-gap-1">
+            {(["day", "week", "month"] as CalendarView[]).map((v) => (
+              <button
+                key={v}
+                onClick={() => setView(v)}
+                className={`sui-px-3 sui-py-1 sui-rounded-full sui-text-label sui-font-semibold sui-transition-all sui-capitalize ${
+                  view === v
+                    ? "sui-bg-admin-action-background sui-text-white"
+                    : "sui-text-neutral-text-medium hover:sui-bg-white"
+                }`}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+          <div className="sui-ml-auto sui-flex sui-items-center sui-gap-2">
+            <button
+              onClick={handlePrevious}
+              className="sui-grid sui-place-content-center sui-rounded-full sui-border sui-border-neutral-border sui-bg-white sui-h-[28px] sui-w-[28px] hover:sui-bg-neutral-background-weak"
+              aria-label="Previous"
+            >
+              <SimpleIcon name="chevron_left" size="s" />
+            </button>
+            <span className="sui-text-sm sui-font-medium sui-text-neutral-text">
+              {view === "month" && format(currentDate, "MMMM yyyy")}
+              {view === "week" && `Week of ${format(startOfWeek(currentDate, { weekStartsOn: 0 }), "MMM d, yyyy")}`}
+              {view === "day" && format(currentDate, "EEEE, MMMM d, yyyy")}
+            </span>
+            <button
+              onClick={handleNext}
+              className="sui-grid sui-place-content-center sui-rounded-full sui-border sui-border-neutral-border sui-bg-white sui-h-[28px] sui-w-[28px] hover:sui-bg-neutral-background-weak"
+              aria-label="Next"
+            >
+              <SimpleIcon name="chevron_right" size="s" />
+            </button>
+          </div>
+        </div>
+
         <TooltipProvider>
-          <div className="sui-flex sui-flex-1 sui-flex-col sui-overflow-auto">
+          <div className="sui-flex sui-flex-1 sui-flex-col sui-overflow-auto sui-p-4 sui-bg-white">
             {view === "month" && (
               <MonthView
                 currentDate={currentDate}
@@ -784,7 +818,6 @@ export function EventCalendar({
                 currentDate={currentDate}
                 events={events}
                 onEventSelect={handleEventSelect}
-                onEventCreate={handleEventCreate}
               />
             )}
             {view === "day" && (
@@ -792,7 +825,6 @@ export function EventCalendar({
                 currentDate={currentDate}
                 events={events}
                 onEventSelect={handleEventSelect}
-                onEventCreate={handleEventCreate}
               />
             )}
           </div>

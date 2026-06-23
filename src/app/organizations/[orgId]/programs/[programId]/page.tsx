@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useParams } from "next/navigation";
 import { OrgLayout } from "@/components/layout/OrgLayout";
 import { NavItem, BreadcrumbItem } from "@/components/layout/types";
 import { ProgramHeader } from "@/components/programs/ProgramHeader";
@@ -150,6 +151,7 @@ const mockDivisions = [
 ];
 
 export default function ProgramPage() {
+  const { orgId, programId } = useParams() as { orgId: string; programId: string };
   const [activeTab, setActiveTab] = useState("schedule");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
@@ -160,6 +162,8 @@ export default function ProgramPage() {
       content: (
         <TeamsTab
           divisions={mockDivisions}
+          orgId={orgId}
+          programId={programId}
           onCreateTeam={(divisionId) => console.log("Create team in division:", divisionId)}
           onEditTeam={(teamId) => console.log("Edit team:", teamId)}
           onArchiveTeam={(teamId) => console.log("Archive team:", teamId)}

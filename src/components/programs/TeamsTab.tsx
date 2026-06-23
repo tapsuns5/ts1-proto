@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { SimpleIcon } from "../SimpleIcon";
 import { SimpleLabelButton } from "../SimpleLabelButton";
 import Toggle from "../Toggle/Toggle";
-import Status from "../Status/Status";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +14,6 @@ import {
   DialogFooter,
   DialogClose,
 } from "../Dialog/Dialog";
-import Label from "../Label/Label";
 
 interface Team {
   id: string;
@@ -35,6 +33,8 @@ interface Division {
 
 interface TeamsTabProps {
   divisions?: Division[];
+  orgId?: string;
+  programId?: string;
   onCreateTeam?: (divisionId: string) => void;
   onEditTeam?: (teamId: string) => void;
   onArchiveTeam?: (teamId: string) => void;
@@ -45,6 +45,8 @@ interface TeamsTabProps {
 
 export function TeamsTab({
   divisions = [],
+  orgId,
+  programId,
   onCreateTeam,
   onEditTeam,
   onArchiveTeam,
@@ -58,6 +60,7 @@ export function TeamsTab({
   const [selectedTeamForDialog, setSelectedTeamForDialog] = useState<Team | null>(null);
   const [accessOption, setAccessOption] = useState("temporary");
   const [teamRoles, setTeamRoles] = useState<Record<string, string>>({});
+  const [redirecting, setRedirecting] = useState(false);
   const [expandedDivisions, setExpandedDivisions] = useState<Set<string>>(
     new Set(divisions.map((d) => d.id))
   );
@@ -223,7 +226,7 @@ export function TeamsTab({
                             <div className="sui-flex sui-gap-1 sui-items-center sui-min-w-0">
                               {selectedUxOption === "Option 1" ? (
                                 <button
-                                  onClick={() => setSelectedTeamForDialog(team)}
+                                  onClick={() => setSelectedTeamForDialog({ ...team, division: division.name })}
                                   className="sui-truncate sui-text-left sui-bg-transparent sui-border-none sui-cursor-pointer sui-text-admin-action-text hover:sui-underline"
                                   title={team.name}
                                 >
@@ -259,7 +262,7 @@ export function TeamsTab({
                             <div className="sui-flex sui-gap-1 sui-items-center sui-justify-end">
                               {selectedUxOption === "Option 1" && (
                                 <button
-                                  onClick={() => setSelectedTeamForDialog(team)}
+                                  onClick={() => setSelectedTeamForDialog({ ...team, division: division.name })}
                                   className="sui-grid sui-place-content-center sui-rounded-full sui-border sui-border-transparent active:sui-scale-95 sui-text-neutral-icon hover:sui-border-admin-action-border hover:sui-bg-admin-action-background-weak-hover hover:sui-text-action-icon active:sui-bg-admin-action-background-weak-pressed sui-h-[32px] sui-w-[32px] sui-min-w-[32px]"
                                   type="button"
                                   data-testid={`external-link-${team.name}`}
@@ -344,7 +347,7 @@ export function TeamsTab({
                         <div className="sui-flex sui-gap-1 sui-items-center sui-min-w-0 sui-overflow-hidden">
                           {selectedUxOption === "Option 1" ? (
                             <button
-                              onClick={() => setSelectedTeamForDialog(team)}
+                              onClick={() => setSelectedTeamForDialog({ ...team, division: team.division || "" })}
                               className="sui-truncate sui-text-left sui-bg-transparent sui-border-none sui-cursor-pointer sui-text-admin-action-text hover:sui-underline"
                               title={team.name}
                             >
@@ -383,7 +386,7 @@ export function TeamsTab({
                         <div className="sui-flex sui-gap-1">
                           {selectedUxOption === "Option 1" && (
                             <button
-                              onClick={() => setSelectedTeamForDialog(team)}
+                              onClick={() => setSelectedTeamForDialog({ ...team, division: team.division || "" })}
                               className="sui-grid sui-place-content-center sui-rounded-full sui-border sui-border-transparent active:sui-scale-95 sui-text-neutral-icon hover:sui-border-admin-action-border hover:sui-bg-admin-action-background-weak-hover hover:sui-text-action-icon active:sui-bg-admin-action-background-weak-pressed sui-h-[32px] sui-w-[32px] sui-min-w-[32px]"
                               type="button"
                               data-testid={`external-link-${team.name}`}
@@ -444,7 +447,7 @@ export function TeamsTab({
           </DialogHeader>
           <DialogBody className="sui-px-3 sui-mb-3">
             <p className="sui-body">
-              You don't currently have a role on this team. How would you like to access it?
+              You don&apos;t currently have a role on this team. How would you like to access it?
             </p>
           </DialogBody>
           <div className="sui-px-3 sui-grid sui-gap-3">
@@ -459,7 +462,7 @@ export function TeamsTab({
               />
               <div className="sui-flex sui-flex-col sui-gap-1">
                 <span className="sui-body sui-font-medium">Add me as a Team Manager</span>
-                <span className="sui-caption sui-text-neutral-text-medium">Full team access - you'll be added to the team's staff.</span>
+                <span className="sui-caption sui-text-neutral-text-medium">Full team access - you&apos;ll be added to the team&apos;s staff.</span>
               </div>
             </label>
             <label className="sui-flex sui-items-start sui-gap-3 sui-cursor-pointer sui-group">
@@ -473,7 +476,7 @@ export function TeamsTab({
               />
               <div className="sui-flex sui-flex-col sui-gap-1">
                 <span className="sui-body sui-font-medium">Add me as a Coach</span>
-                <span className="sui-caption sui-text-neutral-text-medium">Full team access - you'll be added to the team's staff.</span>
+                <span className="sui-caption sui-text-neutral-text-medium">Full team access - you&apos;ll be added to the team&apos;s staff.</span>
               </div>
             </label>
             <label className="sui-flex sui-items-start sui-gap-3 sui-cursor-pointer sui-group">
@@ -499,18 +502,47 @@ export function TeamsTab({
               type="primary"
               label="Open team"
               onClick={() => {
-                if (selectedTeamForDialog && (accessOption === "manager" || accessOption === "coach")) {
+                if (!selectedTeamForDialog) {
+                  setSelectedTeamForDialog(null);
+                  return;
+                }
+                if (accessOption === "manager" || accessOption === "coach") {
                   setTeamRoles((prev) => ({
                     ...prev,
                     [selectedTeamForDialog.id]: accessOption === "manager" ? "Team Manager" : "Coach",
                   }));
+                  setSelectedTeamForDialog(null);
+                  setRedirecting(true);
+                  window.setTimeout(() => {
+                    const org = orgId || "org";
+                    const program = programId || "program";
+                    const teamNameParam = encodeURIComponent(selectedTeamForDialog.name);
+                    const divisionParam = encodeURIComponent(selectedTeamForDialog.division || "");
+                    const url = `/organizations/${org}/programs/${program}/teams/${selectedTeamForDialog.id}/staff?teamName=${teamNameParam}&division=${divisionParam}`;
+                    window.open(url, "_blank", "noopener,noreferrer");
+                    setRedirecting(false);
+                  }, 1200);
+                } else {
+                  setSelectedTeamForDialog(null);
                 }
-                setSelectedTeamForDialog(null);
               }}
             />
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {redirecting && (
+        <div className="sui-fixed sui-inset-0 sui-z-[1000] sui-flex sui-flex-col sui-items-center sui-justify-center sui-bg-white/90 sui-gap-4">
+          <SimpleIcon
+            name="progress_activity"
+            size="l"
+            className="sui-animate-spin sui-text-admin-action-text"
+          />
+          <p className="sui-text-body sui-font-medium">
+            Redirecting you to the Staff Page
+          </p>
+        </div>
+      )}
     </section>
   );
 }

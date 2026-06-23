@@ -31,6 +31,7 @@ import { DraftGamesReadyModal } from "../schedule-wizard/DraftGamesReadyModal";
 import { ScheduleCards, type ScheduleCardItem } from "./ScheduleCards";
 import { UnscheduledBanner } from "./UnscheduledBanner";
 import { UnscheduledTable } from "./UnscheduledTable";
+import { ScheduleTabV2 } from "./ScheduleTabV2";
 import { Sheet, SheetContent, SheetHeader, SheetBody, SheetFooter, SheetTitle } from "../Sheet/Sheet";
 import { DataReport } from "./DataReport";
 import { getCreatedEvents, getCreatedSchedules, updateScheduleStatus } from "../schedule-wizard/utils/scheduleStorage";
@@ -383,6 +384,7 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
   const [isClientLoaded, setIsClientLoaded] = useState(false);
   const [dataReportSheetOpen, setDataReportSheetOpen] = useState(false);
   const [showUnscheduledGames, setShowUnscheduledGames] = useState(false);
+  const [selectedUxOption, setSelectedUxOption] = useState("V1");
 
   // Generate unscheduled game events from existing teams
   const generateUnscheduledEvents = (sourceEvents: ScheduleEvent[]): ScheduleEvent[] => {
@@ -651,6 +653,7 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
           />
         )}
 
+        {selectedUxOption === "V1" && (
         <section className="sui-flex sui-flex-col sui-gap-3 sui-mb-2 sui-pt-4 lg:sui-flex-row lg:sui-gap-2 lg:sui-justify-between lg:sui-items-start">
           {/* Filters Section */}
           <div className="sui-flex sui-flex-col sui-gap-2 sui-flex-wrap sm:sui-flex-row">
@@ -770,6 +773,7 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
             </div>
           </div>
         </section>
+        )}
 
         {/* Loading Overlay */}
         {generationProgress > 0 && (
@@ -796,8 +800,9 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
           onToggle={handleToggleUnscheduled}
         />
 
-        <div className="sui-mb-4">
-          <header className="sui-flex sui-border sui-border-neutral-border sui-items-center sui-flex-col md:sui-flex-row sui-pl-0 md:sui-pl-[20px] sui-rounded-t-lg sui-bg-white sui-gap-2">
+        {selectedUxOption === "V1" ? (
+          <div className="sui-mb-4">
+            <header className="sui-flex sui-border sui-border-neutral-border sui-items-center sui-flex-col md:sui-flex-row sui-pl-0 md:sui-pl-[20px] sui-rounded-t-lg sui-bg-white sui-gap-2">
             {selectedEvents.size > 0 && (
               <div className="sui-flex sui-flex-col sm:sui-flex-row sui-items-start sm:sui-items-center sui-gap-2 sui-p-2 sui-w-full sm:sui-w-auto">
                 <p className="sui-font-bold sui-whitespace-nowrap">
@@ -1116,9 +1121,53 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
           </table>
             )}
           </div>
-        </div>
+          </div>
+        ) : (
+          <div className="sui-mb-4">
+            <ScheduleTabV2
+              events={allEvents}
+              selectedEvents={selectedEvents}
+              selectedDate={selectedDate}
+              selectedSchedules={selectedSchedules}
+              scheduleOptions={scheduleOptions}
+              showUnscheduledGames={showUnscheduledGames}
+              potentialUnscheduledEvents={potentialUnscheduledEvents}
+              onToggleEventSelection={toggleEventSelection}
+              onToggleDateSelection={toggleDateSelection}
+              onToggleSelectAll={(checked) => {
+                if (checked) {
+                  setSelectedEvents(new Set(displayEvents.map(event => event.id)));
+                } else {
+                  setSelectedEvents(new Set());
+                }
+              }}
+              onSchedulesChange={setSelectedSchedules}
+              onToggleUnscheduled={handleToggleUnscheduled}
+              onConflictBadgeClick={handleConflictBadgeClick}
+              onCoachConflictBadgeClick={handleCoachConflictBadgeClick}
+              onStatsClick={() => setDataReportSheetOpen(true)}
+              onCreateScheduleClick={() => setScheduleWizardOpen(true)}
+              addImportDropdown={
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild data-testid="add-import-dropdown-trigger">
+                    <LabelButton size="small" variantType="secondary" labelText="Add/Import" className="sui-flex-shrink-0" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuContent align="end">
+                      <AddGameDialog />
+                      <AddPracticeDialog />
+                      <AddOtherEventDialog />
+                      <DropdownMenuItem>Import games by CSV</DropdownMenuItem>
+                      <DropdownMenuItem>Import practices by CSV</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenuPortal>
+                </DropdownMenu>
+              }
+            />
+          </div>
+        )}
       </div>
-      
+
       <ConflictDetailsDialog
         open={conflictDialogOpen}
         onClose={() => {
@@ -1186,6 +1235,23 @@ export function ScheduleTab({ events }: ScheduleTabProps) {
           />
         </SheetContent>
       </Sheet>
+
+      {/* Floating UX Toggle */}
+      <div className="sui-fixed sui-bottom-4 sui-left-1/2 sui--translate-x-1/2 sui-z-50 sui-bg-white sui-rounded-full sui-shadow-2 sui-border sui-border-solid sui-border-neutral-border sui-p-1 sui-flex sui-gap-1">
+        {["V1", "V2"].map((option) => (
+          <button
+            key={option}
+            onClick={() => setSelectedUxOption(option)}
+            className={`sui-px-4 sui-py-2 sui-rounded-full sui-text-label sui-font-semibold sui-transition-all ${
+              selectedUxOption === option
+                ? "sui-bg-admin-action-background sui-text-white"
+                : "sui-text-neutral-text-medium hover:sui-bg-neutral-background-weak"
+            }`}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

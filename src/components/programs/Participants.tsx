@@ -12,6 +12,7 @@ export interface Participant {
   id: string;
   name: string;
   initials: string;
+  jerseyNumber?: number;
   dateOfBirth?: string;
   age?: number;
   gender?: string;
@@ -45,6 +46,7 @@ function generateMockParticipants(): Participant[] {
       id: "1",
       name: "Emily Palmer",
       initials: "EP",
+      jerseyNumber: 12,
       dateOfBirth: "3/19/1994",
       age: 32,
       team: "Test",
@@ -59,6 +61,7 @@ function generateMockParticipants(): Participant[] {
       id: "2",
       name: "Jack Jones",
       initials: "JJ",
+      jerseyNumber: 7,
       gender: "male",
       team: "Dodgers",
       division: "8U",
@@ -76,6 +79,7 @@ function generateMockParticipants(): Participant[] {
       id: "3",
       name: "Jack Jones",
       initials: "JJ",
+      jerseyNumber: 23,
       gender: "male",
       team: "Marlins",
       role: "Player",
@@ -92,6 +96,7 @@ function generateMockParticipants(): Participant[] {
       id: "4",
       name: "TT PP",
       initials: "TP",
+      jerseyNumber: 45,
       gender: "male",
       dateOfBirth: "3/3/2016",
       age: 10,
@@ -105,6 +110,7 @@ function generateMockParticipants(): Participant[] {
       id: "5",
       name: "TTT PPP",
       initials: "TP",
+      jerseyNumber: 33,
       gender: "female",
       dateOfBirth: "12/12/2016",
       age: 9,
@@ -118,6 +124,7 @@ function generateMockParticipants(): Participant[] {
       id: "6",
       name: "Tyler Palmer",
       initials: "TP",
+      jerseyNumber: 1,
       dateOfBirth: "9/20/1991",
       age: 34,
       team: "Marlins",
@@ -132,6 +139,7 @@ function generateMockParticipants(): Participant[] {
       id: "7",
       name: "Tyler Palmer",
       initials: "TP",
+      jerseyNumber: 5,
       dateOfBirth: "9/20/1991",
       age: 34,
       team: "Marlins",
@@ -150,6 +158,7 @@ function generateMockParticipants(): Participant[] {
       id: "8",
       name: "Tyler Staff",
       initials: "TS",
+      jerseyNumber: 99,
       dateOfBirth: "9/20/1991",
       age: 34,
       team: "Tyler's Baseball Team",
@@ -164,6 +173,7 @@ function generateMockParticipants(): Participant[] {
       id: "9",
       name: "Tyler StaffPalmer",
       initials: "TS",
+      jerseyNumber: 8,
       team: "Tyler's Baseball Team",
       division: "9U",
       role: "Head Coach",
@@ -176,6 +186,7 @@ function generateMockParticipants(): Participant[] {
       id: "10",
       name: "Tyler Palmer",
       initials: "TP",
+      jerseyNumber: 15,
       dateOfBirth: "9/20/1991",
       age: 34,
       team: "Marlins",
@@ -190,6 +201,7 @@ function generateMockParticipants(): Participant[] {
       id: "11",
       name: "Tyler Palmer",
       initials: "TP",
+      jerseyNumber: 42,
       gender: "male",
       dateOfBirth: "9/20/1991",
       age: 34,
@@ -205,6 +217,7 @@ function generateMockParticipants(): Participant[] {
       id: "12",
       name: "Tyler 2nd User",
       initials: "TU",
+      jerseyNumber: 17,
       team: "Marlins",
       role: "Player",
       hasAccount: true,
@@ -216,6 +229,7 @@ function generateMockParticipants(): Participant[] {
       id: "13",
       name: "Tyler Staf Palmer",
       initials: "TP",
+      jerseyNumber: 21,
       dateOfBirth: "9/20/1991",
       age: 34,
       team: "Tyler's Baseball Team",
@@ -230,6 +244,7 @@ function generateMockParticipants(): Participant[] {
       id: "14",
       name: "Tyler Staff2 Palmer",
       initials: "TP",
+      jerseyNumber: 34,
       team: "Tyler's Baseball Team",
       division: "9U",
       role: "Head Coach",
@@ -242,6 +257,7 @@ function generateMockParticipants(): Participant[] {
       id: "15",
       name: "Tyler Staff5 Palmer",
       initials: "TP",
+      jerseyNumber: 56,
       team: "Dodgers",
       division: "8U",
       role: "Coach",
@@ -254,6 +270,7 @@ function generateMockParticipants(): Participant[] {
       id: "16",
       name: "Tyler Staff52 Palmer",
       initials: "TP",
+      jerseyNumber: 67,
       team: "Unassigned",
       role: "Coach",
       hasAccount: false,
@@ -264,6 +281,7 @@ function generateMockParticipants(): Participant[] {
       id: "17",
       name: "Tyler User Palmer",
       initials: "TP",
+      jerseyNumber: 89,
       gender: "male",
       dateOfBirth: "9/20/2009",
       age: 16,
@@ -449,6 +467,9 @@ export function Participants({ participants: propParticipants, teamFilter, showA
                   <th className="sui-p-2 sui-text-left sui-align-middle sui-body-dense">
                     <span>Participant ({filteredParticipants.length})</span>
                   </th>
+                  <th className="sui-p-2 sui-text-left sui-align-middle sui-body-dense sui-w-[80px]">
+                    <span>Jersey #</span>
+                  </th>
                   <th className="sui-p-2 sui-text-left sui-align-middle sui-body-dense">
                     <span>Date of Birth (Age)</span>
                   </th>
@@ -502,6 +523,15 @@ export function Participants({ participants: propParticipants, teamFilter, showA
                             </span>
                           )}
                         </div>
+                      </div>
+                    </td>
+                    <td className="sui-p-2 sui-align-middle sui-body-dense sui-w-[80px]">
+                      <div className="sui-body-dense">
+                        {participant.jerseyNumber ? (
+                          <span className="sui-font-semibold">#{participant.jerseyNumber}</span>
+                        ) : (
+                          <span className="sui-text-neutral-text-medium">—</span>
+                        )}
                       </div>
                     </td>
                     <td className="sui-p-2 sui-align-middle sui-body-dense">

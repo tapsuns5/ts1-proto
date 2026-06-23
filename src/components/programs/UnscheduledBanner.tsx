@@ -14,6 +14,10 @@ export function UnscheduledBanner({
   isShowingUnscheduled,
   onToggle,
 }: UnscheduledBannerProps) {
+  if (count === 0) {
+    return null;
+  }
+
   const message = isShowingUnscheduled
     ? `Showing ${count} event${count === 1 ? "" : "s"} with no date assigned.`
     : `${count} event${count === 1 ? "" : "s"} have no date assigned and won't appear in this view.`;
