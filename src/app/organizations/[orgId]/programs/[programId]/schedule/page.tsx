@@ -317,99 +317,75 @@ export default function SchedulePage() {
       value: "calendar",
       label: "Calendar",
       content: (
-        <div className="sui-mx-auto">
-          {/* Filter bar */}
-          <div className="sui-flex sui-flex-wrap sui-items-center sui-justify-between sui-gap-2 sui-p-2 sui-mb-2">
-            <div className="sui-flex sui-flex-wrap sui-items-center sui-gap-2">
-              <Combobox
-                values={selectedPrograms}
-                onValuesChange={(vals) => setSelectedPrograms(vals)}
-              >
-                <ComboboxTrigger label="All Programs" />
-                <ComboboxContent headerTitle="Select programs">
-                  <ComboboxList showSelectAllOption>
-                    <ComboboxItem value="Spring 2025 Soccer" label="Spring 2025 Soccer" keywords={["Spring 2025 Soccer"]} />
-                    <ComboboxItem value="Summer 2025 Baseball" label="Summer 2025 Baseball" keywords={["Summer 2025 Baseball"]} />
-                    <ComboboxItem value="Fall 2025 Football" label="Fall 2025 Football" keywords={["Fall 2025 Football"]} />
-                    <ComboboxItem value="Winter 2025 Basketball" label="Winter 2025 Basketball" keywords={["Winter 2025 Basketball"]} />
-                  </ComboboxList>
-                </ComboboxContent>
-              </Combobox>
-
-              <Combobox
-                values={selectedDivisions}
-                onValuesChange={(vals) => setSelectedDivisions(vals)}
-              >
-                <ComboboxTrigger label="All Divisions / Teams" />
-                <ComboboxContent headerTitle="Select divisions / teams">
-                  <ComboboxList showSelectAllOption>
-                    <ComboboxItem value="10U" label="10U" keywords={["10U"]} />
-                    <ComboboxItem value="12U" label="12U" keywords={["12U"]} />
-                    <ComboboxItem value="14U" label="14U" keywords={["14U"]} />
-                    <ComboboxItem value="8U" label="8U" keywords={["8U"]} />
-                  </ComboboxList>
-                </ComboboxContent>
-              </Combobox>
-
-              <Combobox
-                values={selectedVenues}
-                onValuesChange={(vals) => setSelectedVenues(vals)}
-              >
-                <ComboboxTrigger label="All Venues" />
-                <ComboboxContent headerTitle="Select venues">
-                  <ComboboxList showSelectAllOption>
-                    <ComboboxItem value="Main Stadium" label="Main Stadium" keywords={["Main Stadium"]} />
-                    <ComboboxItem value="Field A" label="Field A" keywords={["Field A"]} />
-                    <ComboboxItem value="Field B" label="Field B" keywords={["Field B"]} />
-                    <ComboboxItem value="Community Center" label="Community Center" keywords={["Community Center"]} />
-                    <ComboboxItem value="Indoor Facility" label="Indoor Facility" keywords={["Indoor Facility"]} />
-                    <ComboboxItem value="Community Park" label="Community Park" keywords={["Community Park"]} />
-                  </ComboboxList>
-                </ComboboxContent>
-              </Combobox>
-
-              <Combobox
-                values={selectedEventTypes}
-                onValuesChange={(vals) => setSelectedEventTypes(vals)}
-              >
-                <ComboboxTrigger label="All Event Types" />
-                <ComboboxContent headerTitle="Select event types">
-                  <ComboboxList showSelectAllOption>
-                    <ComboboxItem value="game" label="Game" keywords={["Game"]} />
-                    <ComboboxItem value="practice" label="Practice" keywords={["Practice"]} />
-                    <ComboboxItem value="other" label="Other event" keywords={["Other event"]} />
-                  </ComboboxList>
-                </ComboboxContent>
-              </Combobox>
-            </div>
-
-            <div className="sui-flex sui-items-center sui-gap-2">
-              <button className="sui-font-semibold sui-rounded-full sui-border sui-border-solid sui-cursor-pointer sui-transition-all sui-flex sui-items-center sui-gap-2 sui-flex-shrink-0 sui-bg-white sui-text-admin-action-text sui-border-admin-action-border hover:sui-bg-admin-action-background-weak-hover active:sui-scale-95 sui-text-sm sui-h-[32px] sui-pl-[18px] sui-pr-3 sui-py-0">
-                <span className="material-symbols-rounded sui-text-xl">location_on</span>
-                <span>Manage</span>
-              </button>
-              <button className="sui-font-semibold sui-rounded-full sui-border sui-border-solid sui-cursor-pointer sui-transition-all sui-flex sui-items-center sui-gap-2 sui-flex-shrink-0 sui-bg-white sui-text-admin-action-text sui-border-admin-action-border hover:sui-bg-admin-action-background-weak-hover active:sui-scale-95 sui-text-sm sui-h-[32px] sui-pl-[18px] sui-pr-3 sui-py-0">
-                <span className="material-symbols-rounded sui-text-xl">download</span>
-                <span>Export</span>
-              </button>
-              <LabelButton
-                variantType="primary"
-                labelText="Add Event"
-                size="small"
-                onClick={() => {
-                  // Handle add event
-                }}
-              />
-            </div>
-          </div>
-          <EventCalendar
-            events={events}
-            onEventAdd={handleEventAdd}
-            onEventUpdate={handleEventUpdate}
-            onEventDelete={handleEventDelete}
-            initialView="week"
-          />
-        </div>
+        <EventCalendar
+          events={events}
+          onEventAdd={handleEventAdd}
+          onEventUpdate={handleEventUpdate}
+          onEventDelete={handleEventDelete}
+          initialView="week"
+          filterBar={
+            <>
+              <div className="sui-flex sui-flex-wrap sui-items-center sui-gap-2">
+                <Combobox values={selectedPrograms} onValuesChange={(vals) => setSelectedPrograms(vals)}>
+                  <ComboboxTrigger label="All Programs" />
+                  <ComboboxContent headerTitle="Select programs">
+                    <ComboboxList showSelectAllOption>
+                      <ComboboxItem value="Spring 2025 Soccer" label="Spring 2025 Soccer" keywords={["Spring 2025 Soccer"]} />
+                      <ComboboxItem value="Summer 2025 Baseball" label="Summer 2025 Baseball" keywords={["Summer 2025 Baseball"]} />
+                      <ComboboxItem value="Fall 2025 Football" label="Fall 2025 Football" keywords={["Fall 2025 Football"]} />
+                      <ComboboxItem value="Winter 2025 Basketball" label="Winter 2025 Basketball" keywords={["Winter 2025 Basketball"]} />
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
+                <Combobox values={selectedDivisions} onValuesChange={(vals) => setSelectedDivisions(vals)}>
+                  <ComboboxTrigger label="All Divisions / Teams" />
+                  <ComboboxContent headerTitle="Select divisions / teams">
+                    <ComboboxList showSelectAllOption>
+                      <ComboboxItem value="10U" label="10U" keywords={["10U"]} />
+                      <ComboboxItem value="12U" label="12U" keywords={["12U"]} />
+                      <ComboboxItem value="14U" label="14U" keywords={["14U"]} />
+                      <ComboboxItem value="8U" label="8U" keywords={["8U"]} />
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
+                <Combobox values={selectedVenues} onValuesChange={(vals) => setSelectedVenues(vals)}>
+                  <ComboboxTrigger label="All Venues" />
+                  <ComboboxContent headerTitle="Select venues">
+                    <ComboboxList showSelectAllOption>
+                      <ComboboxItem value="Main Stadium" label="Main Stadium" keywords={["Main Stadium"]} />
+                      <ComboboxItem value="Field A" label="Field A" keywords={["Field A"]} />
+                      <ComboboxItem value="Field B" label="Field B" keywords={["Field B"]} />
+                      <ComboboxItem value="Community Center" label="Community Center" keywords={["Community Center"]} />
+                      <ComboboxItem value="Indoor Facility" label="Indoor Facility" keywords={["Indoor Facility"]} />
+                      <ComboboxItem value="Community Park" label="Community Park" keywords={["Community Park"]} />
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
+                <Combobox values={selectedEventTypes} onValuesChange={(vals) => setSelectedEventTypes(vals)}>
+                  <ComboboxTrigger label="All Event Types" />
+                  <ComboboxContent headerTitle="Select event types">
+                    <ComboboxList showSelectAllOption>
+                      <ComboboxItem value="game" label="Game" keywords={["Game"]} />
+                      <ComboboxItem value="practice" label="Practice" keywords={["Practice"]} />
+                      <ComboboxItem value="other" label="Other event" keywords={["Other event"]} />
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
+              </div>
+              <div className="sui-flex sui-items-center sui-gap-2">
+                <button className="sui-font-semibold sui-rounded-full sui-border sui-border-solid sui-cursor-pointer sui-transition-all sui-flex sui-items-center sui-gap-2 sui-flex-shrink-0 sui-bg-white sui-text-admin-action-text sui-border-admin-action-border hover:sui-bg-admin-action-background-weak-hover active:sui-scale-95 sui-text-sm sui-h-[32px] sui-pl-[18px] sui-pr-3 sui-py-0">
+                  <span className="material-symbols-rounded sui-text-xl">location_on</span>
+                  <span>Manage</span>
+                </button>
+                <button className="sui-font-semibold sui-rounded-full sui-border sui-border-solid sui-cursor-pointer sui-transition-all sui-flex sui-items-center sui-gap-2 sui-flex-shrink-0 sui-bg-white sui-text-admin-action-text sui-border-admin-action-border hover:sui-bg-admin-action-background-weak-hover active:sui-scale-95 sui-text-sm sui-h-[32px] sui-pl-[18px] sui-pr-3 sui-py-0">
+                  <span className="material-symbols-rounded sui-text-xl">download</span>
+                  <span>Export</span>
+                </button>
+                <LabelButton variantType="primary" labelText="Add Event" size="small" onClick={() => {}} />
+              </div>
+            </>
+          }
+        />
       ),
     },
     {

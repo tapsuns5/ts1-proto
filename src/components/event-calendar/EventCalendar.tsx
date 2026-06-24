@@ -59,6 +59,7 @@ interface EventCalendarProps {
   onEventDelete?: (eventId: string) => void;
   className?: string;
   initialView?: CalendarView;
+  filterBar?: React.ReactNode;
 }
 
 const typeColorMap: Record<EventType, string> = {
@@ -669,6 +670,7 @@ export function EventCalendar({
   onEventDelete,
   className,
   initialView = "week",
+  filterBar,
 }: EventCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date("2026-06-15"));
   const [view, setView] = useState<CalendarView>(initialView);
@@ -732,55 +734,30 @@ export function EventCalendar({
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className={`sui-flex sui-flex-col sui-rounded-lg sui-border sui-border-neutral-border sui-bg-white sui-shadow-1 sui-min-h-[500px] ${className || ""}`}>
-        <div className="sui-flex sui-items-center sui-justify-between sui-p-2 sui-border-b sui-border-neutral-border sui-flex-wrap sui-gap-2">
-          <div className="sui-flex sui-items-center sui-gap-2">
-            <LabelButton variantType="secondary" labelText="Today" onClick={handleToday} size="small" />
+        {filterBar && (
+          <div className="sui-flex sui-flex-wrap sui-items-center sui-justify-between sui-gap-2 sui-px-3 sui-py-2 sui-border-b sui-border-neutral-border sui-bg-neutral-background-weak">
+            {filterBar}
           </div>
-          <div className="sui-flex sui-items-center sui-gap-2">
-            <div className="sui-flex sui-items-center sui-gap-3 sui-mr-2">
-              <span className="sui-flex sui-items-center sui-gap-1 sui-caption">
-                <span className={`sui-block sui-size-[12px] ${typeDotMap.game} sui-rounded-full`} />
-                <span className="hidden sm:inline">Game</span>
-              </span>
-              <span className="sui-flex sui-items-center sui-gap-1 sui-caption">
-                <span className={`sui-block sui-size-[12px] ${typeDotMap.practice} sui-rounded-full`} />
-                <span className="hidden sm:inline">Practice</span>
-              </span>
-              <span className="sui-flex sui-items-center sui-gap-1 sui-caption">
-                <span className={`sui-block sui-size-[12px] ${typeDotMap.other} sui-rounded-full`} />
-                <span className="hidden sm:inline">Other</span>
-              </span>
+        )}
+        {/* Unified toolbar */}
+        <div className="sui-flex sui-flex-wrap sui-items-center sui-justify-between sui-gap-2 sui-px-3 sui-py-2 sui-border-b sui-border-neutral-border sui-bg-neutral-background-weak">
+          <div className="sui-flex sui-items-center sui-gap-2 sui-flex-wrap">
+            <div className="sui-flex sui-bg-white sui-rounded-full sui-border sui-border-solid sui-border-neutral-border sui-p-1 sui-gap-1">
+              {(["day", "week", "month"] as CalendarView[]).map((v) => (
+                <button
+                  key={v}
+                  onClick={() => setView(v)}
+                  className={`sui-px-3 sui-py-1 sui-rounded-full sui-text-label sui-font-semibold sui-transition-all sui-capitalize ${
+                    view === v
+                      ? "sui-bg-admin-action-background sui-text-white"
+                      : "sui-text-neutral-text-medium hover:sui-bg-neutral-background-weak"
+                  }`}
+                >
+                  {v}
+                </button>
+              ))}
             </div>
-            <LabelButton
-              variantType="primary"
-              labelText="New Event"
-              size="small"
-              onClick={() => {
-                setSelectedEvent(null);
-                handleEventCreate(new Date());
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Calendar sub-tabs and date navigation */}
-        <div className="sui-flex sui-items-center sui-gap-2 sui-px-3 sui-py-2 sui-border-b sui-border-solid sui-border-neutral-border sui-bg-white">
-          <div className="sui-flex sui-bg-neutral-background-weak sui-rounded-full sui-p-1 sui-gap-1">
-            {(["day", "week", "month"] as CalendarView[]).map((v) => (
-              <button
-                key={v}
-                onClick={() => setView(v)}
-                className={`sui-px-3 sui-py-1 sui-rounded-full sui-text-label sui-font-semibold sui-transition-all sui-capitalize ${
-                  view === v
-                    ? "sui-bg-admin-action-background sui-text-white"
-                    : "sui-text-neutral-text-medium hover:sui-bg-white"
-                }`}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
-          <div className="sui-ml-auto sui-flex sui-items-center sui-gap-2">
+            <LabelButton variantType="secondary" labelText="Today" onClick={handleToday} size="small" />
             <button
               onClick={handlePrevious}
               className="sui-grid sui-place-content-center sui-rounded-full sui-border sui-border-neutral-border sui-bg-white sui-h-[28px] sui-w-[28px] hover:sui-bg-neutral-background-weak"
@@ -800,6 +777,22 @@ export function EventCalendar({
             >
               <SimpleIcon name="chevron_right" size="s" />
             </button>
+          </div>
+          <div className="sui-flex sui-items-center sui-gap-3">
+            <div className="sui-flex sui-items-center sui-gap-3">
+              <span className="sui-flex sui-items-center sui-gap-1 sui-caption">
+                <span className={`sui-block sui-size-[12px] ${typeDotMap.game} sui-rounded-full`} />
+                <span className="hidden sm:inline">Game</span>
+              </span>
+              <span className="sui-flex sui-items-center sui-gap-1 sui-caption">
+                <span className={`sui-block sui-size-[12px] ${typeDotMap.practice} sui-rounded-full`} />
+                <span className="hidden sm:inline">Practice</span>
+              </span>
+              <span className="sui-flex sui-items-center sui-gap-1 sui-caption">
+                <span className={`sui-block sui-size-[12px] ${typeDotMap.other} sui-rounded-full`} />
+                <span className="hidden sm:inline">Other</span>
+              </span>
+            </div>
           </div>
         </div>
 

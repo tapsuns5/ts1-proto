@@ -248,10 +248,13 @@ export function EditProgramDialog({
                   <div className="sui-flex sui-items-center sui-justify-between">
                     <div>
                       <p className="sui-text-sm sui-font-medium sui-text-neutral-text">
-                        {league.league_name}
+                        League Name: {league.league_name}
                       </p>
                       <p className="sui-text-xs sui-text-neutral-text-medium sui-mt-0.5">
                         League ID: {league.league_id}
+                      </p>
+                      <p className="sui-text-xs sui-text-neutral-text-medium sui-mt-0.5">
+                        Child Account ID: {league.child_account_id}
                       </p>
                     </div>
                     {rcxLeague === league.league_id && (

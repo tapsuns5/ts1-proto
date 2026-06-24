@@ -120,11 +120,52 @@ export function VenueScheduleView({
   }, [venueGroups, selectedEventTypes]);
 
   return (
-    <div className="sui-flex sui-flex-col sui-gap-2 sui-pt-2">
-     
+    <div className="sui-border sui-border-neutral-border sui-rounded-lg sui-bg-white">
+      {/* Row 1: Date nav + Legend */}
+      <div className="sui-flex sui-flex-wrap sui-items-center sui-justify-between sui-gap-2 sui-px-3 sui-py-2 sui-border-b sui-border-neutral-border/50 sui-bg-neutral-background-weak">
+        <div className="sui-flex sui-items-center sui-gap-2">
+          <button
+            className="sui-grid sui-place-content-center sui-rounded-full sui-border sui-border-neutral-border sui-bg-white sui-h-[32px] sui-w-[32px] hover:sui-bg-neutral-background-weak"
+            onClick={() => onDateChange(subDays(date, 1))}
+          >
+            <SimpleIcon name="chevron_left" size="s" />
+          </button>
+          <span className="sui-text-sm sui-font-semibold sui-text-neutral-text">
+            {dateLabel}
+          </span>
+          <button
+            className="sui-grid sui-place-content-center sui-rounded-full sui-border sui-border-neutral-border sui-bg-white sui-h-[32px] sui-w-[32px] hover:sui-bg-neutral-background-weak"
+            onClick={() => onDateChange(addDays(date, 1))}
+          >
+            <SimpleIcon name="chevron_right" size="s" />
+          </button>
+          {!isToday && (
+            <button
+              className="sui-px-2 sui-py-0.5 sui-rounded-full sui-border sui-border-neutral-border sui-bg-white sui-text-xs sui-text-neutral-text hover:sui-bg-neutral-background-weak"
+              onClick={() => onDateChange(new Date())}
+            >
+              Today
+            </button>
+          )}
+        </div>
+        <div className="sui-flex sui-gap-2 sui-items-center">
+          <p className="sui-flex sui-items-center sui-gap-1 sui-caption">
+            <span className="sui-block sui-size-[12px] sui-bg-green-50 sui-rounded-full" />
+            <span className="hidden sm:inline">Game</span>
+          </p>
+          <p className="sui-flex sui-items-center sui-gap-1 sui-caption">
+            <span className="sui-block sui-size-[12px] sui-bg-orange-60 sui-rounded-full" />
+            <span className="hidden sm:inline">Practice</span>
+          </p>
+          <p className="sui-flex sui-items-center sui-gap-1 sui-caption">
+            <span className="sui-block sui-size-[12px] sui-bg-skyblue-60 sui-rounded-full" />
+            <span className="hidden sm:inline">Other event</span>
+          </p>
+        </div>
+      </div>
 
-      {/* Filters + Actions row */}
-      <div className="sui-flex sui-flex-wrap sui-items-center sui-justify-between sui-gap-2">
+      {/* Row 2: Filters + Actions */}
+      <div className="sui-flex sui-flex-wrap sui-items-center sui-justify-between sui-gap-2 sui-px-3 sui-py-2 sui-border-b sui-border-neutral-border/50 sui-bg-neutral-background-weak">
         <div className="sui-flex sui-flex-wrap sui-items-center sui-gap-2">
           <Combobox
             values={selectedPrograms}
@@ -181,7 +222,6 @@ export function VenueScheduleView({
             </ComboboxContent>
           </Combobox>
         </div>
-
         <div className="sui-flex sui-items-center sui-gap-2">
           <SimpleLabelButton
             type="secondary"
@@ -206,52 +246,8 @@ export function VenueScheduleView({
         </div>
       </div>
 
-      {/* Date nav + Indicators */}
-      <div className="sui-flex sui-items-center sui-justify-between sui-gap-2">
-        <div className="sui-flex sui-items-center sui-gap-2">
-          <button
-            className="sui-grid sui-place-content-center sui-rounded-full sui-border sui-border-neutral-border sui-bg-white sui-h-[32px] sui-w-[32px] hover:sui-bg-neutral-background-weak"
-            onClick={() => onDateChange(subDays(date, 1))}
-          >
-            <SimpleIcon name="chevron_left" size="s" />
-          </button>
-          <span className="sui-text-xs sui-font-medium sui-text-neutral-text">
-            {dateLabel}
-          </span>
-          <button
-            className="sui-grid sui-place-content-center sui-rounded-full sui-border sui-border-neutral-border sui-bg-white sui-h-[32px] sui-w-[32px] hover:sui-bg-neutral-background-weak"
-            onClick={() => onDateChange(addDays(date, 1))}
-          >
-            <SimpleIcon name="chevron_right" size="s" />
-          </button>
-          {!isToday && (
-            <button
-              className="sui-px-2 sui-py-0.5 sui-rounded-full sui-border sui-border-neutral-border sui-bg-white sui-text-xs sui-text-neutral-text hover:sui-bg-neutral-background-weak"
-              onClick={() => onDateChange(new Date())}
-            >
-              Today
-            </button>
-          )}
-        </div>
-
-        <div className="sui-flex sui-gap-2 sui-items-center">
-          <p className="sui-flex sui-items-center sui-gap-1 sui-caption">
-            <span className="sui-block sui-size-[12px] sui-bg-green-50 sui-rounded-full" />
-            <span className="hidden sm:inline">Game</span>
-          </p>
-          <p className="sui-flex sui-items-center sui-gap-1 sui-caption">
-            <span className="sui-block sui-size-[12px] sui-bg-orange-60 sui-rounded-full" />
-            <span className="hidden sm:inline">Practice</span>
-          </p>
-          <p className="sui-flex sui-items-center sui-gap-1 sui-caption">
-            <span className="sui-block sui-size-[12px] sui-bg-skyblue-60 sui-rounded-full" />
-            <span className="hidden sm:inline">Other event</span>
-          </p>
-        </div>
-      </div>
-
       {/* Grid */}
-      <div className="sui-border sui-border-neutral-border sui-rounded-lg sui-bg-white sui-overflow-x-auto">
+      <div className="sui-overflow-x-auto">
         <div className="sui-flex sui-flex-col sui-min-w-max">
           {/* Header row with hour columns */}
           <div className="sui-flex sui-border-b sui-border-neutral-border sui-sticky sui-top-0 sui-z-20 sui-bg-white">

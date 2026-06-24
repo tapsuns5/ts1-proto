@@ -35,6 +35,7 @@ interface CreateProgramDialogProps {
     staff: number;
     teams: number;
     isRCX?: boolean;
+    rcxLeagueName?: string;
   }) => void;
 }
 
@@ -96,6 +97,7 @@ export function CreateProgramDialog({ open, onClose, onCreate }: CreateProgramDi
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (onCreate && activeDates && activeDates[0] && activeDates[1]) {
+      const selectedLeagueData = leagues.find((l) => l.league_id === selectedLeague);
       onCreate({
         id: crypto.randomUUID().slice(0, 5),
         name: programName,
@@ -107,6 +109,7 @@ export function CreateProgramDialog({ open, onClose, onCreate }: CreateProgramDi
         staff: 0,
         teams: 0,
         isRCX: true,
+        rcxLeagueName: selectedLeagueData?.league_name,
       });
     }
     onClose();
@@ -350,10 +353,13 @@ export function CreateProgramDialog({ open, onClose, onCreate }: CreateProgramDi
                       <div className="sui-flex sui-items-center sui-justify-between">
                         <div>
                           <p className="sui-text-sm sui-font-medium sui-text-neutral-text">
-                            {league.league_name}
+                            League Name: {league.league_name}
                           </p>
                           <p className="sui-text-xs sui-text-neutral-text-medium sui-mt-0.5">
                             League ID: {league.league_id}
+                          </p>
+                          <p className="sui-text-xs sui-text-neutral-text-medium sui-mt-0.5">
+                            Child Account ID: {league.child_account_id}
                           </p>
                         </div>
                         {selectedLeague === league.league_id && (

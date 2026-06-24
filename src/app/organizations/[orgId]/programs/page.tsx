@@ -46,6 +46,7 @@ type Program = {
   staff: number;
   teams: number;
   isRCX?: boolean;
+  rcxLeagueName?: string;
 };
 
 const initialPrograms: Program[] = [
@@ -82,6 +83,7 @@ const initialPrograms: Program[] = [
     staff: 100,
     teams: 50,
     isRCX: true,
+    rcxLeagueName: "U14 Boys Football Winter",
   },
 ];
 
@@ -115,11 +117,18 @@ export default function ProgramsPage() {
             >
               {program.name}
               {program.isRCX && (
-                <img
-                  alt="RCX Sports"
-                  className="sui-h-2 sui-w-auto sui-pl-3"
-                  src="/RCXSports_Vert_CMYK.png"
-                />
+                <div className="sui-flex sui-items-center sui-gap-2 sui-pl-3">
+                  <img
+                    alt="RCX Sports"
+                    className="sui-h-2 sui-w-auto"
+                    src="/RCXSports_Vert_CMYK.png"
+                  />
+                  {program.rcxLeagueName && (
+                    <p className="sui-text-[10px] sui-text-neutral-text-medium">
+                      {program.rcxLeagueName}
+                    </p>
+                  )}
+                </div>
               )}
             </button>
           </h2>
