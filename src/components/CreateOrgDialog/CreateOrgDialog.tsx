@@ -124,10 +124,10 @@ export function CreateOrgDialog({ open, onOpenChange, onCreate }: CreateOrgDialo
   const [rcxLeague, setRcxLeague] = useState<string | null>(null);
 
   const rcxLeagues = [
-    { league_id: "RCX-LEAGUE-123", child_account_id: "RCX-CHILD-456", league_name: "U10 Boys Soccer Spring" },
-    { league_id: "RCX-LEAGUE-124", child_account_id: "RCX-CHILD-457", league_name: "U12 Girls Soccer Fall" },
-    { league_id: "RCX-LEAGUE-125", child_account_id: "RCX-CHILD-458", league_name: "U8 Coed Baseball Summer" },
-    { league_id: "RCX-LEAGUE-126", child_account_id: "RCX-CHILD-459", league_name: "U14 Boys Football Winter" },
+    { league_id: "RCX-LEAGUE-123", child_account_id: "RCX-CHILD-456", league_name: "RCX NFL Flag" },
+    { league_id: "RCX-LEAGUE-124", child_account_id: "RCX-CHILD-457", league_name: "RCX MLS Go" },
+    { league_id: "RCX-LEAGUE-125", child_account_id: "RCX-CHILD-458", league_name: "RCX NBA Youth" },
+    { league_id: "RCX-LEAGUE-126", child_account_id: "RCX-CHILD-459", league_name: "RCX MLB Little League" },
   ];
 
   const toggleAllSections = () => {
@@ -339,13 +339,7 @@ export function CreateOrgDialog({ open, onOpenChange, onCreate }: CreateOrgDialo
                         <div className="sui-flex sui-items-center sui-justify-between">
                           <div>
                             <p className="sui-text-sm sui-font-medium sui-text-neutral-text">
-                              League Name: {league.league_name}
-                            </p>
-                            <p className="sui-text-xs sui-text-neutral-text-medium sui-mt-0.5">
-                              League ID: {league.league_id}
-                            </p>
-                            <p className="sui-text-xs sui-text-neutral-text-medium sui-mt-0.5">
-                              Child Account ID: {league.child_account_id}
+                              RCX Org Name: {league.league_name}
                             </p>
                           </div>
                           {rcxLeague === league.league_id && (
