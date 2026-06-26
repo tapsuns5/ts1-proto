@@ -122,6 +122,7 @@ export function CreateOrgDialog({ open, onOpenChange, onCreate }: CreateOrgDialo
   const [allExpanded, setAllExpanded] = useState(true);
   const [showRcxPrograms, setShowRcxPrograms] = useState(false);
   const [rcxLeague, setRcxLeague] = useState<string | null>(null);
+  const [rcxError, setRcxError] = useState<string | null>(null);
 
   const rcxLeagues = [
     { league_id: "RCX-LEAGUE-123", child_account_id: "RCX-CHILD-456", league_name: "RCX NFL Flag" },
@@ -136,7 +137,15 @@ export function CreateOrgDialog({ open, onOpenChange, onCreate }: CreateOrgDialo
 
   const handleSaveRcxParentCode = () => {
     if (formData.rcxParentCode.trim()) {
-      setShowRcxPrograms(true);
+      if (formData.rcxParentCode === "9") {
+        setRcxError("No RCX account found for this code");
+        setShowRcxPrograms(false);
+        setRcxLeague(null);
+      } else {
+        setRcxError(null);
+        setShowRcxPrograms(true);
+        setRcxLeague("ftl-optimist-club");
+      }
     }
   };
 
@@ -296,60 +305,44 @@ export function CreateOrgDialog({ open, onOpenChange, onCreate }: CreateOrgDialo
                   </div>
                 </div>
 
-                {/* RCX Programs - shown after Save */}
+                {/* Error message */}
+                {rcxError && (
+                  <div className="sui-mt-2 sui-text-sm" style={{ color: 'red' }}>
+                    {rcxError}
+                  </div>
+                )}
+
+                {/* RCX Account - shown after Save */}
                 {showRcxPrograms && (
                   <div className="sui-mt-4 sui-grid sui-grid-cols-1 sui-gap-2">
-                    {/* None option */}
+                    {/* FTL Optimist Club option */}
                     <button
                       type="button"
-                      onClick={() => setRcxLeague(null)}
+                      onClick={() => setRcxLeague("ftl-optimist-club")}
                       className={`sui-relative sui-text-left sui-rounded-lg sui-border sui-border-solid sui-p-3 sui-cursor-pointer sui-transition-all ${
-                        rcxLeague === null
+                        rcxLeague === "ftl-optimist-club"
                           ? 'sui-border-admin-action-border sui-bg-admin-action-background-weak-hover'
                           : 'sui-border-neutral-border sui-bg-white hover:sui-bg-neutral-background-weak'
                       }`}
                     >
+                      <img
+                        alt="RCX Sports"
+                        className="sui-absolute sui-top-2 sui-right-8 sui-h-2 sui-w-auto"
+                        src="/RCXSports_Vert_CMYK.png"
+                      />
                       <div className="sui-flex sui-items-center sui-justify-between">
-                        <p className="sui-text-sm sui-font-medium sui-text-neutral-text">
-                          None
-                        </p>
-                        {rcxLeague === null && (
-                          <div className="sui-flex sui-items-center sui-justify-center sui-w-5 sui-h-5 sui-rounded-full sui-bg-admin-action-background">
+                        <div>
+                          <p className="sui-text-sm sui-font-medium sui-text-neutral-text">
+                            RCX Account Name: FTL Optimist Club
+                          </p>
+                        </div>
+                        {rcxLeague === "ftl-optimist-club" && (
+                          <div className="sui-flex sui-items-center sui-justify-center sui-w-4 sui-h-4 sui-rounded-full sui-bg-admin-action-background">
                             <Icon name="check" size="s" className="sui-text-white" />
                           </div>
                         )}
                       </div>
                     </button>
-                    {rcxLeagues.map((league) => (
-                      <button
-                        key={league.league_id}
-                        type="button"
-                        onClick={() => setRcxLeague(league.league_id)}
-                        className={`sui-relative sui-text-left sui-rounded-lg sui-border sui-border-solid sui-p-3 sui-cursor-pointer sui-transition-all ${
-                          rcxLeague === league.league_id
-                            ? 'sui-border-admin-action-border sui-bg-admin-action-background-weak-hover'
-                            : 'sui-border-neutral-border sui-bg-white hover:sui-bg-neutral-background-weak'
-                        }`}
-                      >
-                        <img
-                          alt="RCX Sports"
-                          className="sui-absolute sui-top-2 sui-right-2 sui-h-2 sui-w-auto"
-                          src="/RCXSports_Vert_CMYK.png"
-                        />
-                        <div className="sui-flex sui-items-center sui-justify-between">
-                          <div>
-                            <p className="sui-text-sm sui-font-medium sui-text-neutral-text">
-                              RCX Org Name: {league.league_name}
-                            </p>
-                          </div>
-                          {rcxLeague === league.league_id && (
-                            <div className="sui-flex sui-items-center sui-justify-center sui-w-5 sui-h-5 sui-rounded-full sui-bg-admin-action-background">
-                              <Icon name="check" size="s" className="sui-text-white" />
-                            </div>
-                          )}
-                        </div>
-                      </button>
-                    ))}
                   </div>
                 )}
               </CollapsibleCardContent>

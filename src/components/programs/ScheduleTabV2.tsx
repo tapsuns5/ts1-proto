@@ -670,7 +670,6 @@ export function ScheduleTabV2({
     filterOptions?: { value: string; label: string }[],
     selectedValues?: string[],
     onValuesChange?: (values: string[]) => void,
-    extra?: React.ReactNode,
   ) => {
     const isOpen = activeHeaderMenu === columnKey;
     const isSorted = sortConfig?.key === columnKey;
@@ -746,7 +745,6 @@ export function ScheduleTabV2({
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>
-        {extra}
       </div>
     );
   };
@@ -940,7 +938,7 @@ export function ScheduleTabV2({
                 <span className="hidden sm:inline">Venue</span>
               </button>
             </div>
-            <div className="sui-flex sui-items-center sui-gap-3">
+            <div className="sui-flex sui-items-center sui-gap-2">
               <SimpleLabelButton type="tertiary" size="small" label="ET - Eastern" className="sui-flex-shrink-0" />
               <div className="sui-flex sui-gap-2 sui-items-center">
                 <p className="sui-flex sui-items-center sui-gap-1 sui-caption">
@@ -960,12 +958,12 @@ export function ScheduleTabV2({
                 <Popover.Trigger asChild>
                   <button
                     type="button"
-                    className="sui-grid sui-place-content-center sui-h-[32px] sui-w-[32px] sui-rounded-full sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-text-neutral-icon hover:sui-text-admin-action-text hover:sui-border-admin-action-border sui-transition-colors sui-relative"
-                    title="Filter"
+                    className="sui-flex sui-items-center sui-gap-1 sui-px-3 sui-h-[32px] sui-rounded-full sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-text-sm sui-font-normal sui-text-neutral-text hover:sui-text-admin-action-text hover:sui-border-admin-action-border hover:sui-bg-admin-action-background-weak-hover sui-transition-colors"
                   >
-                    <SimpleIcon name="filter_list" size="s" />
+                    <SimpleIcon name="filter_list" size="s" className="sui-text-neutral-icon" />
+                    <span>Filter</span>
                     {activeFilterCount > 0 && (
-                      <span className="sui-absolute sui-right-0 sui-top-0 sui-block sui-size-[8px] sui-bg-admin-action-background sui-rounded-full sui-border sui-border-white" />
+                      <span className="sui-bg-neutral-background-medium sui-text-neutral-text-medium sui-text-[10px] sui-font-mono sui-rounded sui-px-1 sui-leading-[16px]">{activeFilterCount}</span>
                     )}
                   </button>
                 </Popover.Trigger>
@@ -973,10 +971,9 @@ export function ScheduleTabV2({
                   <Popover.Content
                     align="end"
                     sideOffset={4}
-                    className="sui-z-50 sui-w-[320px] sui-rounded-xl sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-shadow-2 sui-p-3 sui-flex sui-flex-col sui-gap-3"
+                    className="sui-z-50 sui-w-[280px] sui-rounded-lg sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-shadow-2 sui-p-3 sui-flex sui-flex-col sui-gap-2"
                   >
-                    <p className="sui-text-body-dense sui-font-bold">Filter by</p>
-                    <div className="sui-flex sui-flex-col sui-gap-3">
+                    <div className="sui-flex sui-flex-col sui-gap-2">
                       <div className="sui-flex sui-flex-col sui-gap-1">
                         <span className="sui-text-label-sm sui-text-neutral-text-medium">Schedule</span>
                         <Combobox values={selectedSchedules} onValuesChange={onSchedulesChange}>
@@ -1043,8 +1040,8 @@ export function ScheduleTabV2({
                         </Combobox>
                       </div>
                     </div>
-                    <div className="sui-flex sui-justify-between sui-pt-2 sui-border-t sui-border-solid sui-border-neutral-border">
-                      <SimpleLabelButton type="tertiary" size="small" label="Reset filters" onClick={resetFilters} />
+                    <div className="sui-flex sui-justify-between sui-pt-1 sui-border-t sui-border-solid sui-border-neutral-border">
+                      <SimpleLabelButton type="tertiary" size="small" label="Reset" onClick={resetFilters} />
                       <SimpleLabelButton type="primary" size="small" label="Apply" onClick={() => setFilterMenuOpen(false)} />
                     </div>
                   </Popover.Content>
@@ -1054,12 +1051,12 @@ export function ScheduleTabV2({
                 <Popover.Trigger asChild>
                   <button
                     type="button"
-                    className="sui-grid sui-place-content-center sui-h-[32px] sui-w-[32px] sui-rounded-full sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-text-neutral-icon hover:sui-text-admin-action-text hover:sui-border-admin-action-border sui-transition-colors sui-relative"
-                    title="Sort"
+                    className="sui-flex sui-items-center sui-gap-1 sui-px-3 sui-h-[32px] sui-rounded-full sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-text-sm sui-font-normal sui-text-neutral-text hover:sui-text-admin-action-text hover:sui-border-admin-action-border hover:sui-bg-admin-action-background-weak-hover sui-transition-colors"
                   >
-                    <SimpleIcon name="sort" size="s" />
+                    <SimpleIcon name="sort" size="s" className="sui-text-neutral-icon" />
+                    <span>Sort</span>
                     {sortConfig && (
-                      <span className="sui-absolute sui-right-0 sui-top-0 sui-block sui-size-[8px] sui-bg-admin-action-background sui-rounded-full sui-border sui-border-white" />
+                      <span className="sui-bg-neutral-background-medium sui-text-neutral-text-medium sui-text-[10px] sui-font-mono sui-rounded sui-px-1 sui-leading-[16px]">1</span>
                     )}
                   </button>
                 </Popover.Trigger>
@@ -1067,9 +1064,9 @@ export function ScheduleTabV2({
                   <Popover.Content
                     align="end"
                     sideOffset={4}
-                    className="sui-z-50 sui-w-[220px] sui-rounded-xl sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-shadow-2 sui-p-3 sui-flex sui-flex-col sui-gap-3"
+                    className="sui-z-50 sui-w-[200px] sui-rounded-lg sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-shadow-2 sui-p-2 sui-flex sui-flex-col sui-gap-2"
                   >
-                    <p className="sui-text-body-dense sui-font-bold">Sort</p>
+                    <p className="sui-text-label-sm sui-font-semibold sui-text-neutral-text-medium sui-px-1">Sort by</p>
                     <div className="sui-flex sui-flex-col sui-gap-1">
                       {[
                         { key: "schedule", label: "Schedule" },
@@ -1093,7 +1090,7 @@ export function ScheduleTabV2({
                                 return { key: col.key, direction: "asc" };
                               });
                             }}
-                            className={`sui-flex sui-items-center sui-justify-between sui-w-full sui-px-3 sui-py-2 sui-text-left sui-text-body-dense sui-rounded-lg hover:sui-bg-neutral-background-weak ${active ? "sui-bg-admin-action-background-weak-hover sui-text-admin-action-text" : ""}`}
+                            className={`sui-flex sui-items-center sui-justify-between sui-w-full sui-px-2 sui-py-1.5 sui-text-left sui-text-body-dense sui-rounded hover:sui-bg-neutral-background-weak ${active ? "sui-bg-admin-action-background-weak-hover sui-text-admin-action-text" : ""}`}
                           >
                             <span>{col.label}</span>
                             {active && sortConfig && (
@@ -1103,7 +1100,7 @@ export function ScheduleTabV2({
                         );
                       })}
                     </div>
-                    <div className="sui-flex sui-justify-end sui-pt-2 sui-border-t sui-border-solid sui-border-neutral-border">
+                    <div className="sui-flex sui-justify-end sui-pt-1 sui-border-t sui-border-solid sui-border-neutral-border">
                       <SimpleLabelButton type="tertiary" size="small" label="Clear" onClick={() => setSortConfig(null)} />
                     </div>
                   </Popover.Content>
@@ -1113,19 +1110,19 @@ export function ScheduleTabV2({
                 <Popover.Trigger asChild>
                   <button
                     type="button"
-                    className="sui-grid sui-place-content-center sui-h-[32px] sui-w-[32px] sui-rounded-full sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-text-neutral-icon hover:sui-text-admin-action-text hover:sui-border-admin-action-border sui-transition-colors"
-                    title="Row height"
+                    className="sui-flex sui-items-center sui-gap-1 sui-px-3 sui-h-[32px] sui-rounded-full sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-text-sm sui-font-normal sui-text-neutral-text hover:sui-text-admin-action-text hover:sui-border-admin-action-border hover:sui-bg-admin-action-background-weak-hover sui-transition-colors"
                   >
-                    <SimpleIcon name="height" size="s" />
+                    <SimpleIcon name="height" size="s" className="sui-text-neutral-icon" />
+                    <span>Height</span>
                   </button>
                 </Popover.Trigger>
                 <Popover.Portal>
                   <Popover.Content
                     align="end"
                     sideOffset={4}
-                    className="sui-z-50 sui-w-[180px] sui-rounded-xl sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-shadow-2 sui-p-3 sui-flex sui-flex-col sui-gap-3"
+                    className="sui-z-50 sui-w-[160px] sui-rounded-lg sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-shadow-2 sui-p-2 sui-flex sui-flex-col sui-gap-1"
                   >
-                    <p className="sui-text-body-dense sui-font-bold">Row height</p>
+                    <p className="sui-text-label-sm sui-font-semibold sui-text-neutral-text-medium sui-px-1">Row height</p>
                     <div className="sui-flex sui-flex-col sui-gap-1">
                       {[
                         { key: "short", label: "Short" },
@@ -1139,7 +1136,7 @@ export function ScheduleTabV2({
                             setRowHeight(opt.key as "short" | "default" | "tall");
                             setRowHeightMenuOpen(false);
                           }}
-                          className={`sui-flex sui-items-center sui-justify-between sui-w-full sui-px-3 sui-py-2 sui-text-left sui-text-body-dense sui-rounded-lg hover:sui-bg-neutral-background-weak ${rowHeight === opt.key ? "sui-bg-admin-action-background-weak-hover sui-text-admin-action-text" : ""}`}
+                          className={`sui-flex sui-items-center sui-justify-between sui-w-full sui-px-2 sui-py-1.5 sui-text-left sui-text-body-dense sui-rounded hover:sui-bg-neutral-background-weak ${rowHeight === opt.key ? "sui-bg-admin-action-background-weak-hover sui-text-admin-action-text" : ""}`}
                         >
                           <span>{opt.label}</span>
                           {rowHeight === opt.key && <SimpleIcon name="check" size="s" className="sui-text-[14px]" />}
@@ -1159,19 +1156,19 @@ export function ScheduleTabV2({
                 <Popover.Trigger asChild>
                   <button
                     type="button"
-                    className="sui-grid sui-place-content-center sui-h-[32px] sui-w-[32px] sui-rounded-full sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-text-neutral-icon hover:sui-text-admin-action-text hover:sui-border-admin-action-border sui-transition-colors"
-                    title="Select columns"
+                    className="sui-flex sui-items-center sui-gap-1 sui-px-3 sui-h-[32px] sui-rounded-full sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-text-sm sui-font-normal sui-text-neutral-text hover:sui-text-admin-action-text hover:sui-border-admin-action-border hover:sui-bg-admin-action-background-weak-hover sui-transition-colors"
                   >
-                    <SimpleIcon name="view_column" size="s" />
+                    <SimpleIcon name="view_column" size="s" className="sui-text-neutral-icon" />
+                    <span>Columns</span>
                   </button>
                 </Popover.Trigger>
                 <Popover.Portal>
                   <Popover.Content
                     align="end"
                     sideOffset={4}
-                    className="sui-z-50 sui-w-[280px] sui-rounded-xl sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-shadow-2 sui-p-3 sui-flex sui-flex-col sui-gap-3"
+                    className="sui-z-50 sui-w-[260px] sui-rounded-lg sui-border sui-border-solid sui-border-neutral-border sui-bg-white sui-shadow-2 sui-p-2 sui-flex sui-flex-col sui-gap-2"
                   >
-                    <p className="sui-text-body-dense sui-font-bold">Select columns</p>
+                    <p className="sui-text-label-sm sui-font-semibold sui-text-neutral-text-medium sui-px-1">Columns</p>
                     <div className="sui-relative">
                       <SimpleIcon name="search" size="s" className="sui-absolute sui-left-3 sui-top-1/2 -sui-translate-y-1/2 sui-text-neutral-icon-medium" />
                       <input
@@ -1206,7 +1203,7 @@ export function ScheduleTabV2({
                         </div>
                       ))}
                     </div>
-                    <div className="sui-flex sui-justify-end sui-gap-2 sui-pt-2 sui-border-t sui-border-solid sui-border-neutral-border">
+                    <div className="sui-flex sui-justify-end sui-gap-2 sui-pt-1 sui-border-t sui-border-solid sui-border-neutral-border">
                       <SimpleLabelButton type="tertiary" size="small" label="Cancel" onClick={() => setColumnSelectorOpen(false)} />
                       <SimpleLabelButton
                         type="primary"
