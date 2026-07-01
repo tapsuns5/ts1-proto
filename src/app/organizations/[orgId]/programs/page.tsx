@@ -74,7 +74,7 @@ const initialPrograms: Program[] = [
   },
   {
     id: "93873",
-    name: "FTL Flag Football - RCX",
+    name: "FTL Soccer Club - MLS GO",
     status: "active",
     startDate: new Date("2026-05-01"),
     endDate: new Date("2026-05-31"),
@@ -119,15 +119,10 @@ export default function ProgramsPage() {
               {program.isRCX && (
                 <div className="sui-flex sui-items-center sui-gap-2 sui-pl-3">
                   <img
-                    alt="RCX Sports"
+                    alt="MLS GO"
                     className="sui-h-2 sui-w-auto"
-                    src="/RCXSports_Vert_CMYK.png"
+                    src="/MLS_GO_Logo_Green_Trap_bohg0c.png"
                   />
-                  {program.rcxLeagueName && (
-                    <p className="sui-text-[10px] sui-text-neutral-text-medium">
-                      {program.rcxLeagueName}
-                    </p>
-                  )}
                 </div>
               )}
             </button>

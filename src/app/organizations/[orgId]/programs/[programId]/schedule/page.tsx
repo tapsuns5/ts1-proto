@@ -15,6 +15,7 @@ import { Columns } from "@/components/table/Table/Table.types";
 import Pagination from "@/components/table/Pagination/Pagination";
 import { TextLink } from "@/components/TextLink/TextLink";
 import { VenueScheduleView, type VenueGroup } from "@/components/programs/VenueScheduleView";
+import { ScheduleTab, type ScheduleEvent } from "@/components/programs/ScheduleTab";
 import Combobox from "@/components/Combobox/Combobox";
 import { ComboboxTrigger } from "@/components/Combobox/components/ComboboxTrigger";
 import { ComboboxContent } from "@/components/Combobox/Combobox";
@@ -45,7 +46,9 @@ const mockNavItems: NavItem[] = [
 
 interface ScheduleRow {
   id: string;
-  program: string;
+  programId: string;
+  programName: string;
+  scheduleName: string;
   divisions: string[];
   events: number;
   completedGames: { scored: number; unscored: number };
@@ -53,10 +56,35 @@ interface ScheduleRow {
   endDate: string;
 }
 
+// Program IDs and names mirror the current mock program data from /organizations/[orgId]/programs/page.tsx
+
+function toScheduleEvents(calendarEvents: CalendarEvent[]): ScheduleEvent[] {
+  return calendarEvents.map((event) => ({
+    id: event.id,
+    date: format(event.start, "EEE, MMM d, yyyy"),
+    time: `${format(event.start, "h:mm a")} - ${format(event.end, "h:mm a")}`,
+    timezone: "America/New_York",
+    type: event.eventType ?? "other",
+    name: event.title,
+    team: event.teams?.join(" vs ") ?? "",
+    status:
+      event.status === "canceled"
+        ? "canceled"
+        : event.status === "pending"
+        ? "draft"
+        : "published",
+    venue: event.venueName ?? "",
+    subvenue: event.subVenueName,
+    hasConflict: false,
+  }));
+}
+
 const mockSchedules: ScheduleRow[] = [
   {
     id: "1",
-    program: "Spring 2025 Soccer",
+    programId: "90752",
+    programName: "New Program",
+    scheduleName: "Spring 2025 Soccer",
     divisions: ["U10 Boys", "U12 Boys", "U14 Boys"],
     events: 48,
     completedGames: { scored: 32, unscored: 4 },
@@ -65,7 +93,9 @@ const mockSchedules: ScheduleRow[] = [
   },
   {
     id: "2",
-    program: "Summer 2025 Baseball",
+    programId: "85703",
+    programName: "FTL Optimist Baseball League Spring",
+    scheduleName: "Summer 2025 Baseball",
     divisions: ["Minors", "Majors"],
     events: 36,
     completedGames: { scored: 12, unscored: 0 },
@@ -74,7 +104,9 @@ const mockSchedules: ScheduleRow[] = [
   },
   {
     id: "3",
-    program: "Fall 2025 Football",
+    programId: "93873",
+    programName: "FTL Flag Football - RCX",
+    scheduleName: "Fall 2025 Football",
     divisions: ["Pee Wee", "Junior Varsity", "Varsity"],
     events: 24,
     completedGames: { scored: 0, unscored: 0 },
@@ -83,7 +115,9 @@ const mockSchedules: ScheduleRow[] = [
   },
   {
     id: "4",
-    program: "Winter 2025 Basketball",
+    programId: "90752",
+    programName: "New Program",
+    scheduleName: "Winter 2025 Basketball",
     divisions: ["U8 Coed", "U10 Coed", "U12 Girls", "U14 Girls"],
     events: 64,
     completedGames: { scored: 58, unscored: 2 },
@@ -163,16 +197,29 @@ const mockVenueGroups: VenueGroup[] = [
 
 /* ────────────── Table Configs ────────────── */
 
-const SCHEDULE_COLUMNS: Columns = {
-  program: {
+const getScheduleColumns = (orgId: string): Columns => ({
+  scheduleName: {
     label: "Schedule Name",
     align: "left",
-    width: "25%",
+    width: "20%",
     getBodyProps: (row) => ({
       type: "custom" as const,
       children: (
         <TextLink href="#" variantType="primary">
-          {row.program}
+          {row.scheduleName}
+        </TextLink>
+      ),
+    }),
+  },
+  program: {
+    label: "Program",
+    align: "left",
+    width: "20%",
+    getBodyProps: (row) => ({
+      type: "custom" as const,
+      children: (
+        <TextLink href={`/organizations/${orgId}/programs/${row.programId}`} variantType="primary">
+          {row.programName}
         </TextLink>
       ),
     }),
@@ -180,7 +227,7 @@ const SCHEDULE_COLUMNS: Columns = {
   divisions: {
     label: "Division(s)",
     align: "left",
-    width: "25%",
+    width: "20%",
     getBodyProps: (row) => ({
       type: "custom" as const,
       children: row.divisions.join(", "),
@@ -198,7 +245,7 @@ const SCHEDULE_COLUMNS: Columns = {
   completedGames: {
     label: "Completed Games",
     align: "center",
-    width: "20%",
+    width: "15%",
     getBodyProps: (row) => ({
       type: "custom" as const,
       children: (
@@ -211,7 +258,7 @@ const SCHEDULE_COLUMNS: Columns = {
   timePeriod: {
     label: "Time Period",
     align: "center",
-    width: "20%",
+    width: "15%",
     getBodyProps: (row) => ({
       type: "custom" as const,
       children: (
@@ -221,14 +268,14 @@ const SCHEDULE_COLUMNS: Columns = {
       ),
     }),
   },
-};
+});
 
 /* ────────────── Components ────────────── */
 
-function AllSchedulesTable({ data }: { data: ScheduleRow[] }) {
+function AllSchedulesTable({ data, orgId }: { data: ScheduleRow[]; orgId: string }) {
   const { rows, headerRow } = useTableHelpers({
     data,
-    columns: SCHEDULE_COLUMNS,
+    columns: getScheduleColumns(orgId),
   });
   const { currentPage, onPageChange, totalCount, currentRows, pageSize } =
     useTablePagination({ rows, pageSize: 10 });
@@ -283,10 +330,13 @@ export default function SchedulePage() {
     const q = searchQuery.toLowerCase();
     return mockSchedules.filter(
       (s) =>
-        s.program.toLowerCase().includes(q) ||
+        s.scheduleName.toLowerCase().includes(q) ||
+        s.programName.toLowerCase().includes(q) ||
         s.divisions.some((d) => d.toLowerCase().includes(q))
     );
   }, [searchQuery]);
+
+  const scheduleEvents = useMemo(() => toScheduleEvents(events), [events]);
 
   const tabs = [
     {
@@ -300,7 +350,7 @@ export default function SchedulePage() {
               leftIcon="search"
               allowClear
               type="text"
-              placeholder="Search by program or division name"
+              placeholder="Search by schedule, program, or division name"
               size="small"
               inputProps={{ autoComplete: "off" }}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -309,9 +359,14 @@ export default function SchedulePage() {
               className="sui-flex-1 sui-max-w-[400px]"
             />
           </div>
-          <AllSchedulesTable data={filteredSchedules} />
+          <AllSchedulesTable data={filteredSchedules} orgId={params.orgId} />
         </section>
       ),
+    },
+    {
+      value: "events",
+      label: "Events",
+      content: <ScheduleTab events={scheduleEvents} />,
     },
     {
       value: "calendar",
